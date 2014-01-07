@@ -2,10 +2,7 @@ package com.spring.google;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.security.SecureRandom;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,36 +10,30 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
 
+import com.analytics.auth.DemoClass;
+import com.analytics.auth.GoogleAuth;
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.extensions.appengine.datastore.AppEngineDataStoreFactory;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeRequestUrl;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
-import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.analytics.Analytics;
-import com.google.api.services.analytics.Analytics.Data.Ga.Get;
 import com.google.api.services.analytics.AnalyticsScopes;
 import com.google.api.services.analytics.model.Accounts;
 import com.google.api.services.analytics.model.GaData;
-import com.google.api.services.analytics.model.GaData.ColumnHeaders;
-import com.google.api.services.analytics.model.GaData.ProfileInfo;
-import com.google.api.services.analytics.model.GaData.Query;
 import com.google.api.services.analytics.model.Profiles;
 import com.google.api.services.analytics.model.Webproperties;
-import com.google.api.services.tasks.TasksScopes;
+
 
 
 
@@ -60,46 +51,64 @@ public class SpringDemoServlet  {
 	 Analytics analytics;
 	 GaData gaData;
 	 String location;
-	static Credential credential;
+	static GoogleCredential credential;
+	static Credential credentialStore;
 	static String accountInfo;
 	static Logger log = Logger.getLogger(SpringDemoServlet.class.getName());
 @RequestMapping("/oauth2callback")
-public String callBack(HttpServletRequest req, HttpServletResponse resp,ModelMap model) throws IOException
+public String callBack(HttpServletRequest req, HttpServletResponse resp,ModelMap model) 
 {
-	  	System.out.println("callback started");
-		if(req.getParameter("code")==null )
-			{
-			log.info("No code parameter in request");
-			resp.sendRedirect(buildLoginUrl());
-			
-			}
-		else if(req.getParameter("code")!= null)
-		    {
-			log.info("code in request ");
-			System.out.println(req.getParameter("code"));
-			System.out.println(req.getParameter("state"));		
-			GoogleTokenResponse response = flow.newTokenRequest(req.getParameter("code")).setRedirectUri(CALLBACK_URL).execute();	
-			System.out.println(response.getAccessToken());
-			System.out.println(response.getIdToken());
-			System.out.println(response.getRefreshToken());
-			System.out.println(response.getTokenType());
-			System.out.println(response.toPrettyString());
-			credential = flow.createAndStoreCredential(response, null);
-			//credential = new GoogleCredential.Builder().setTransport(HTTP_TRANSPORT).setJsonFactory(JSON_FACTORY).setClientSecrets(getClientSecrets()).build().setFromTokenResponse(response);
-		    log.info("response stored in credential");			
-			analytics =new Analytics.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).setApplicationName("Sample google Analytics ").build(); 
-				
-			String profileId = getProfileId(analytics);
-//				if(profileId != null)
-//				{
-//					gaData = getResults(analytics,profileId);					
-//					printProfileinfo(gaData);
-//				}			
-			
-			location = "redirect:/home";
-		   }
+	try{
 		
-        return location;
+      
+      GoogleAuth.buildLoginUrl(req, resp);
+	  // GoogleAuth.buildLoginUrl(req,resp);
+	   GoogleAuth.callbackAccess(req,resp);
+	}catch(Exception e){
+		e.printStackTrace();
+	}
+//	  	System.out.println("callback started");
+//		if(req.getParameter("code")==null )
+//			{
+//			log.info("No code parameter in request");
+//			resp.sendRedirect(buildLoginUrl());
+//			
+//			}
+//		else if(req.getParameter("code")!= null)
+//		    {
+//			log.info("code in request ");
+//			System.out.println(req.getParameter("code"));
+//			System.out.println(req.getParameter("state"));		
+//			GoogleTokenResponse response = flow.newTokenRequest(req.getParameter("code")).setRedirectUri(CALLBACK_URL).execute();	
+//			System.out.println(response.getAccessToken());
+//			System.out.println(response.getIdToken());
+//			System.out.println(response.getRefreshToken());
+//			System.out.println(response.getTokenType());
+//			System.out.println(response.toPrettyString());
+//			credential = new GoogleCredential.Builder().setTransport(HTTP_TRANSPORT).setJsonFactory(JSON_FACTORY).setClientSecrets(getClientSecrets()).build().setFromTokenResponse(response);
+//			Oauth2 userService = new Oauth2.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).build();
+//			Userinfo info = userService.userinfo().get().execute();
+//			
+//			String emailid = info.getEmail();
+//			credentialStore = flow.createAndStoreCredential(response, emailid);
+//			//credential = new GoogleCredential.Builder().setTransport(HTTP_TRANSPORT).setJsonFactory(JSON_FACTORY).setClientSecrets(getClientSecrets()).build().setFromTokenResponse(response);
+//			//flow.createAndStoreCredential(response, null);
+//			
+//			//credential = new GoogleCredential.Builder().setTransport(HTTP_TRANSPORT).setJsonFactory(JSON_FACTORY).setClientSecrets(getClientSecrets()).build().setFromTokenResponse(response);
+//		    log.info("response stored in credential");			
+//			analytics =new Analytics.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).setApplicationName("Sample google Analytics ").build(); 
+//				
+//			String profileId = getProfileId(analytics);
+////				if(profileId != null)
+////				{
+////					gaData = getResults(analytics,profileId);					
+////					printProfileinfo(gaData);
+////				}			
+//			
+//			location = "redirect:/home";
+//		   }
+		
+        return "home";
 }
 
 //private void printProfileinfo(GaData gaData) {
