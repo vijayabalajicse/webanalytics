@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -51,6 +52,7 @@ public class SpringDemoServlet  {
 	 String location;
 	 
 	 String accountInfo;
+	 GoogleAuth oauth = new GoogleAuth();
 	static Logger log = Logger.getLogger(SpringDemoServlet.class.getName());
 @RequestMapping("/oauth2callback")
 public String callBack(HttpServletRequest req, HttpServletResponse resp,ModelMap model) 
@@ -74,68 +76,27 @@ public String callBack(HttpServletRequest req, HttpServletResponse resp,ModelMap
 	}catch(Exception e){
 		e.printStackTrace();
 	}
-//	  	System.out.println("callback started");
-//		if(req.getParameter("code")==null )
-//			{
-//			log.info("No code parameter in request");
-//			resp.sendRedirect(buildLoginUrl());
-//			
-//			}
-//		else if(req.getParameter("code")!= null)
-//		    {
-//			log.info("code in request ");
-//			System.out.println(req.getParameter("code"));
-//			System.out.println(req.getParameter("state"));		
-//			GoogleTokenResponse response = flow.newTokenRequest(req.getParameter("code")).setRedirectUri(CALLBACK_URL).execute();	
-//			System.out.println(response.getAccessToken());
-//			System.out.println(response.getIdToken());
-//			System.out.println(response.getRefreshToken());
-//			System.out.println(response.getTokenType());
-//			System.out.println(response.toPrettyString());
-//			credential = new GoogleCredential.Builder().setTransport(HTTP_TRANSPORT).setJsonFactory(JSON_FACTORY).setClientSecrets(getClientSecrets()).build().setFromTokenResponse(response);
-//			Oauth2 userService = new Oauth2.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).build();
-//			Userinfo info = userService.userinfo().get().execute();
-//			
-//			String emailid = info.getEmail();
-//			credentialStore = flow.createAndStoreCredential(response, emailid);
-//			//credential = new GoogleCredential.Builder().setTransport(HTTP_TRANSPORT).setJsonFactory(JSON_FACTORY).setClientSecrets(getClientSecrets()).build().setFromTokenResponse(response);
-//			//flow.createAndStoreCredential(response, null);
-//			
-//			//credential = new GoogleCredential.Builder().setTransport(HTTP_TRANSPORT).setJsonFactory(JSON_FACTORY).setClientSecrets(getClientSecrets()).build().setFromTokenResponse(response);
-//		    log.info("response stored in credential");			
-//			analytics =new Analytics.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).setApplicationName("Sample google Analytics ").build(); 
-//				
-//			String profileId = getProfileId(analytics);
-////				if(profileId != null)
-////				{
-////					gaData = getResults(analytics,profileId);					
-////					printProfileinfo(gaData);
-////				}			
-//			
-//			location = "redirect:/home";
-//		   }
+
 		
         return location;
 }
 
-//private void printProfileinfo(GaData gaData) {
-//	ProfileInfo profileInfo = gaData.getProfileInfo();		
-//	tableId = profileInfo.getTableId();
-//}
 
-
-//private GaData getResults(Analytics analytics, String profileId) throws IOException {
-//	
-//	return analytics.data().ga().get("ga:"+profileId, "2013-11-11", "2013-12-25", "ga:visits,ga:newVisits").setDimensions("ga:source,ga:keyword").setSort("-ga:visits").setFilters("ga:medium==organic").setMaxResults(25).execute();
-//}
+@RequestMapping("/logout")
+public String logout(HttpServletRequest req,ModelMap model){
+	
+	HttpSession session = req.getSession(false);
+	session.removeAttribute("SESSION_USERID");
+	session.invalidate();
+	
+	
+	return "logout";
+}
 
 @RequestMapping("/home")
 public  String home( ModelMap model){
 	log.info("Return to Home Page");
-//	if(credential != null){
-//		   analytics =new Analytics.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).setApplicationName("Sample google Analytics ").build(); 
-//		   String profileId = getProfileId(analytics);
-//	   } 	
+ 	
 	return "home";
 }
 

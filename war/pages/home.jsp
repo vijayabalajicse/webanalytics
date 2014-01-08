@@ -19,7 +19,7 @@
 <body>
    <div id="Header">
    You are Authorized as 
-   <%= session.getAttribute("SESSION_USERID") %>
+   <%= session.getAttribute("SESSION_USERID") %> <a href="/logout">Logout</a>
    </div>
   <div class="form-horizontal">
     <div class="form-group">

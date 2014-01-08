@@ -28,7 +28,7 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 
 public class GoogleAuth {
-	  final String CALLBACK_URL = "http://localhost:8888/oauth2callback";
+	 
 	 final JsonFactory JSON_FACTORY = new  JacksonFactory();
 	 final HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
 	 final String SESSION_USERID = "emailId";
@@ -37,7 +37,7 @@ public class GoogleAuth {
 	// CredentialManager credentialManager ;
 	 static final String KIND = GoogleAuth.class.getName();
 	 Oauth2 userService;
-    // static GoogleClientSecrets clientSecrets = getClientSecrets();
+     GoogleClientSecrets clientSecrets = getClientSecrets();
      
      //scopes
      static HashSet<String> scopes = new HashSet<String>(); 	
@@ -86,7 +86,7 @@ public class GoogleAuth {
 	}
 	//get the credential data by emailid
 	private  Credential loadCredential(String emailId) {
-		Credential credential = new GoogleCredential.Builder().setClientSecrets(getClientSecrets()).setJsonFactory(JSON_FACTORY).setTransport(HTTP_TRANSPORT).build();
+		Credential credential = new GoogleCredential.Builder().setClientSecrets(clientSecrets).setJsonFactory(JSON_FACTORY).setTransport(HTTP_TRANSPORT).build();
 		if(getCredentialDataStore(emailId,credential)){
 			return credential;
 		}
@@ -100,8 +100,8 @@ public class GoogleAuth {
 		try{
 		Entity entity = dataStore.get(key);
 		credential.setAccessToken((String) entity.getProperty("accessToken"));
-		credential.setRefreshToken((String) entity.getProperty("refreshToken"));
-		credential.setExpirationTimeMilliseconds((Long) entity.getProperty("expirationTimeMillis"));
+	//	credential.setRefreshToken((String) entity.getProperty("refreshToken"));
+	//	credential.setExpirationTimeMilliseconds((Long) entity.getProperty("expirationTimeMillis"));
 		return true;
 		}catch(Exception e){
 			System.out.println("value not fount in entity");
@@ -143,8 +143,8 @@ public class GoogleAuth {
 		DatastoreService dataStore = DatastoreServiceFactory.getDatastoreService();
 		Entity entity = new Entity(KIND,emailid);
 		entity.setProperty("accessToken", credential_in.getAccessToken());
-		entity.setProperty("refreshToken", credential_in.getRefreshToken());
-		entity.setProperty("expirationTimeMillis", credential_in.getExpirationTimeMilliseconds());
+		//entity.setProperty("refreshToken", credential_in.getRefreshToken());
+		//entity.setProperty("expirationTimeMillis", credential_in.getExpirationTimeMilliseconds());
 		dataStore.put(entity);
 	}
 
@@ -152,8 +152,8 @@ public class GoogleAuth {
 	private  Credential retriveAccesscode(String code) {
 		//GoogleClientSecrets clientSecrets = getClientSecrets();
 		try {
-			GoogleTokenResponse tokenResponse = new GoogleAuthorizationCodeTokenRequest(HTTP_TRANSPORT,JSON_FACTORY,getClientSecrets().getWeb().getClientId(),getClientSecrets().getWeb().getClientSecret(),code,getClientSecrets().getWeb().getRedirectUris().get(0)).execute();
-			return new GoogleCredential.Builder().setClientSecrets(getClientSecrets()).setTransport(HTTP_TRANSPORT).setJsonFactory(JSON_FACTORY).build().setAccessToken(tokenResponse.getAccessToken()).setRefreshToken(tokenResponse.getRefreshToken()).setExpirationTimeMilliseconds(tokenResponse.getExpiresInSeconds());
+			GoogleTokenResponse tokenResponse = new GoogleAuthorizationCodeTokenRequest(HTTP_TRANSPORT,JSON_FACTORY,clientSecrets.getWeb().getClientId(),clientSecrets.getWeb().getClientSecret(),code,clientSecrets.getWeb().getRedirectUris().get(0)).execute();
+			return new GoogleCredential.Builder().setClientSecrets(clientSecrets).setTransport(HTTP_TRANSPORT).setJsonFactory(JSON_FACTORY).build().setAccessToken(tokenResponse.getAccessToken());
 		} catch (IOException e) {
 			
 			System.out.println("Problem at getting Access token");
@@ -166,7 +166,7 @@ public class GoogleAuth {
 		
 		scopes.add(AnalyticsScopes.ANALYTICS_READONLY);
 		scopes.add("https://www.googleapis.com/auth/userinfo.email");		
-		GoogleAuthorizationCodeRequestUrl url = new GoogleAuthorizationCodeRequestUrl(getClientSecrets().getWeb().getClientId(),getClientSecrets().getWeb().getRedirectUris().get(0), scopes).setAccessType("offline").setApprovalPrompt("force");
+		GoogleAuthorizationCodeRequestUrl url = new GoogleAuthorizationCodeRequestUrl(clientSecrets.getWeb().getClientId(),clientSecrets.getWeb().getRedirectUris().get(0), scopes).setAccessType("offline");
 		return url.build();
 	}
 }
