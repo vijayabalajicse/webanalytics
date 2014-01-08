@@ -84,6 +84,6 @@
 	<classpathentry kind="lib" path="war/WEB-INF/lib/google-api-services-tasks-v1-rev25-1.16.0-rc.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/google-api-services-analytics-v3-rev78-1.16.0-rc.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/json-simple-1.1.1.jar"/>
-	<classpathentry kind="lib" path="war/WEB-INF/lib/google-api-services-oauth2-v2-rev35-1.14.2-beta.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/google-api-services-oauth2-v2-rev51-1.17.0-rc.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

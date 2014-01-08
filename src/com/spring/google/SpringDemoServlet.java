@@ -41,29 +41,36 @@ import com.google.api.services.analytics.model.Webproperties;
 @Controller
 @RequestMapping("/")
 public class SpringDemoServlet  {
-	 static final String CALLBACK_URL = "http://analytics-demo-work.appspot.com/oauth2callback";
-	 static final JsonFactory JSON_FACTORY = new  JacksonFactory();
-	 static final HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
-	 static GoogleAuthorizationCodeFlow flow;
-	 static GoogleClientSecrets clientSecrets;	
-	 static String stateToken;	
-	 static String AccountName,WebPropertiesName,ViewName,rowsValue,tableId;	
+	
+	  final JsonFactory JSON_FACTORY = new  JacksonFactory();
+	  final HttpTransport HTTP_TRANSPORT = new NetHttpTransport();	 	
+	 	
+	 String AccountName,WebPropertiesName,ViewName,rowsValue,tableId;	
 	 Analytics analytics;
 	 GaData gaData;
 	 String location;
-	static GoogleCredential credential;
-	static Credential credentialStore;
-	static String accountInfo;
+	 
+	 String accountInfo;
 	static Logger log = Logger.getLogger(SpringDemoServlet.class.getName());
 @RequestMapping("/oauth2callback")
 public String callBack(HttpServletRequest req, HttpServletResponse resp,ModelMap model) 
 {
 	try{
 		
-      
-      GoogleAuth.buildLoginUrl(req, resp);
+      System.out.println(req.getParameter("code"));
+      GoogleAuth oauth = new GoogleAuth();
+      oauth.buildLoginUrl(req, resp);
 	  // GoogleAuth.buildLoginUrl(req,resp);
-	   GoogleAuth.callbackAccess(req,resp);
+      Credential credential =   oauth.callbackAccess(req,resp);
+	   if(credential != null){
+		   analytics =new Analytics.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).setApplicationName("Sample google Analytics ").build(); 
+		   String profileId = getProfileId(analytics);
+		   location = "redirect:/home";
+	   } 
+	 
+		
+
+	 
 	}catch(Exception e){
 		e.printStackTrace();
 	}
@@ -108,7 +115,7 @@ public String callBack(HttpServletRequest req, HttpServletResponse resp,ModelMap
 //			location = "redirect:/home";
 //		   }
 		
-        return "home";
+        return location;
 }
 
 //private void printProfileinfo(GaData gaData) {
@@ -125,13 +132,10 @@ public String callBack(HttpServletRequest req, HttpServletResponse resp,ModelMap
 @RequestMapping("/home")
 public  String home( ModelMap model){
 	log.info("Return to Home Page");
-	System.out.println(AccountName);
-	System.out.println(WebPropertiesName);
-	System.out.println(tableId);
-	model.addAttribute("accountName", AccountName);
-	model.addAttribute("webPropertiesName", WebPropertiesName);
-	model.addAttribute("viewName", ViewName);	
-	model.addAttribute("tableId", tableId);	
+//	if(credential != null){
+//		   analytics =new Analytics.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).setApplicationName("Sample google Analytics ").build(); 
+//		   String profileId = getProfileId(analytics);
+//	   } 	
 	return "home";
 }
 
@@ -271,38 +275,9 @@ private String getProfileId(Analytics analytics)
 	return profileId;
 }
 
-static void initialFlow()  
-	{
-	log.info("Setting the scopes");
-	 HashSet<String> scopes = new HashSet<String>();
-	
-	 scopes.add(AnalyticsScopes.ANALYTICS_READONLY);
-	flow = new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY, getClientSecrets(), scopes).setAccessType("offline").build();
 
-	
-	}
 
- public static String buildLoginUrl() throws IOException
- {
-	 log.info("create laogin url");
-	 initialFlow();
-	 final GoogleAuthorizationCodeRequestUrl url =flow.newAuthorizationUrl();
-	 return url.setRedirectUri(CALLBACK_URL).build();	
- }
-private static GoogleClientSecrets getClientSecrets() 
-{
-	 
-	if(clientSecrets == null)
-	{
-		try {
-			clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(SpringDemoServlet.class.getResourceAsStream("client_secrets.json")));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-	}
-	return clientSecrets;
- }
+ 
+
 
 }

@@ -13,11 +13,14 @@
   <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
   <script type="text/javascript" src="https://www.google.com/jsapi"></script>
   <script type="text/javascript" src="/JS/jScripts.js"></script>
-  <link rel="stylesheet" href="/pages/style.css">
+  <link rel="stylesheet" href="/css/style.css">
   
 </head>
 <body>
-   
+   <div id="Header">
+   You are Authorized as 
+   <%= session.getAttribute("SESSION_USERID") %>
+   </div>
   <div class="form-horizontal">
     <div class="form-group">
       <label class="control-label">Account Name &nbsp &nbsp </label>
