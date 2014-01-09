@@ -1,8 +1,6 @@
 package com.spring.google;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.HashSet;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,19 +15,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.analytics.auth.DemoClass;
+
 import com.analytics.auth.GoogleAuth;
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
-import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeRequestUrl;
-import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.analytics.Analytics;
-import com.google.api.services.analytics.AnalyticsScopes;
 import com.google.api.services.analytics.model.Accounts;
 import com.google.api.services.analytics.model.GaData;
 import com.google.api.services.analytics.model.Profiles;
@@ -52,7 +45,7 @@ public class SpringDemoServlet  {
 	 String location;
 	 
 	 String accountInfo;
-	 GoogleAuth oauth = new GoogleAuth();
+	//GoogleAuth oauth = new GoogleAuth();
 	static Logger log = Logger.getLogger(SpringDemoServlet.class.getName());
 @RequestMapping("/oauth2callback")
 public String callBack(HttpServletRequest req, HttpServletResponse resp,ModelMap model) 
@@ -61,9 +54,10 @@ public String callBack(HttpServletRequest req, HttpServletResponse resp,ModelMap
 		
       System.out.println(req.getParameter("code"));
       GoogleAuth oauth = new GoogleAuth();
+      Credential credential =   oauth.callbackAccess(req,resp);
       oauth.buildLoginUrl(req, resp);
 	  // GoogleAuth.buildLoginUrl(req,resp);
-      Credential credential =   oauth.callbackAccess(req,resp);
+      
 	   if(credential != null){
 		   analytics =new Analytics.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).setApplicationName("Sample google Analytics ").build(); 
 		   String profileId = getProfileId(analytics);
@@ -81,11 +75,24 @@ public String callBack(HttpServletRequest req, HttpServletResponse resp,ModelMap
         return location;
 }
 
+@RequestMapping("/googleLogin")
+public void googleLogin(HttpServletRequest req, HttpServletResponse resp){
+	
+	 GoogleAuth oauth = new GoogleAuth();	 
+	 try {
+		resp.sendRedirect( oauth.getAuthorizationUrl() );
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+}
 
 @RequestMapping("/logout")
 public String logout(HttpServletRequest req,ModelMap model){
 	
 	HttpSession session = req.getSession(false);
+	System.out.println(session.getAttribute("SESSION_USERID"));
 	session.removeAttribute("SESSION_USERID");
 	session.invalidate();
 	
@@ -94,10 +101,16 @@ public String logout(HttpServletRequest req,ModelMap model){
 }
 
 @RequestMapping("/home")
-public  String home( ModelMap model){
+public  String home(HttpServletRequest req,HttpServletResponse resp, ModelMap model){
 	log.info("Return to Home Page");
- 	
-	return "home";
+	String pageLoc = "home";
+ 	HttpSession session =  req.getSession(false);
+ 	if(session.getAttribute("SESSION_USERID") == null || session.getAttribute("SESSION_USERID") == ""){
+ 		
+			pageLoc = "logout";
+		
+ 	}
+	return pageLoc;
 }
 
 

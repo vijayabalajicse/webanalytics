@@ -7,6 +7,7 @@
 <title>Insert title here</title>
 </head>
 <body>
+<%= session.getAttribute("SESSION_USERID") %>
  success logout
 </body>
 </html>
