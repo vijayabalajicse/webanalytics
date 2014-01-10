@@ -51,7 +51,31 @@
                          for(var index in accountName){
                            $('#accountName').append("<option value='"+index+"'>"+accountName[index]+"</option>");                  
                          }
-                                                                                                                                                                                                                                                                                                                                                                                                                      
+                         
+                         propName = accountId[$('#accountName').val()]+"_wname"; 
+                         $('#propName').append("<option value='"+index+"'>"+json[propName][0]+"</option>");
+                         
+                         loc =accountId[$('#accountName').val()];
+                         var proploc =json[loc][0]+"_pname";
+                         console.log("account Id: "+loc);
+                         console.log($('#propName').val());
+                         console.log(proploc);
+                         console.log(json[proploc]);
+                         $('#profName').append("<option value='"+index+"'>"+json[proploc][0]+"</option>");
+                         
+                         var profName = accountId[0];
+                         console.log(profName);
+                         var profLocation = json[profName][0];
+                         console.log(json[profName]);
+                         $('#tabl').val("ga:"+ json[profLocation][0]);
+//                         propName = accountId[$('#accountName').val()]+"_wname";   
+//                         $('#propName').append("<option value='"+index+"'>"+json[propName][0]+"</option>");
+//                         loc =accountId[$('#accountName').val()];
+//                         var proploc =json[loc][$('#propName').val()]+"_pname";   
+//                         $('#profName').append("<option value='"+index+"'>"+json[proploc][0]+"</option>");   
+//                         var profName = accountId[$('#accountName').val()]; 
+//                    	 var profLocation = json[profName][$('#propName').val()];  
+//                    	 $('#tabl').val("ga:"+ json[profLocation][$('#profName').val()]);
                                                                                                                                                                                                                                                                                                                                                                                                                       
                          $('#accountName').click(function(){
                          propName = accountId[$('#accountName').val()]+"_wname";
@@ -177,6 +201,14 @@
 							           
 							         }       
 							         rowsValue = [];
+							         console.log("Row value: " + outputvalue.dataTable.rows);
+							         if(outputvalue.dataTable.rows == "undefined"){
+							        	$('#tablechart').html("No record found for this report");
+							        	console.log("undefined");
+							         }else if(outputvalue.dataTable.rows == null){
+							        	 $('#tablechart').html("No record found for this report");
+							        	 console.log("null");
+							         }
 							         for(var i = 0; i < outputvalue.dataTable.rows.length ; i++)
 							         {
 							           

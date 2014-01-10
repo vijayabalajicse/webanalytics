@@ -268,7 +268,7 @@ public String homeRedirect(HttpServletRequest req,ModelMap model){
 		value = analytics.data().ga().get(table_id, startDate, endDate, metrics).setDimensions(dimension).setOutput("dataTable").setMaxResults(50).execute().toPrettyString();
 		} catch (IOException e) {
 		
-		e.printStackTrace();
+		value = "no data found";
 		}
 	return value;
 	}
@@ -297,7 +297,7 @@ public String homeRedirect(HttpServletRequest req,ModelMap model){
 		log.info("Get profile info");
 		String profileId = null;
 		String accountInfo = null;
-		String accountName ="",webProp = "",profileName ="",profId="",accountId="",propId="";
+		String accountName ="",webProp = "",profileName ="",profId="",accountId="",propId="",defaultvalue="";
 		try
 		{
 			Accounts account = analytics.management().accounts().list().execute();
@@ -307,11 +307,14 @@ public String homeRedirect(HttpServletRequest req,ModelMap model){
 			else{
 				accountName += "\"AccountName\" : [";
 				accountId += "\"AccountId\" : [";
+				defaultvalue += "\"Defaultvalue\" :[";
+				defaultvalue += "\""+account.getItems().get(0).getName() + "\",";
 				for(int i=0; i < account.getItems().size();i++){
 					System.out.println(account.getItems().get(i).getName());
 					//AccountName = account.getItems().get(i).getName();
 					accountName +="\"" + account.getItems().get(i).getName() +"\",";
 					accountId += "\"" + account.getItems().get(i).getId() +"\",";
+					
 					String firstAccountId = account.getItems().get(i).getId();
 					
 					Webproperties webProperties = analytics.management().webproperties().list(firstAccountId).execute();
@@ -323,10 +326,12 @@ public String homeRedirect(HttpServletRequest req,ModelMap model){
 						propId  += "\""+account.getItems().get(i).getId()+"\" :[";
 						webProp += "\""+account.getItems().get(i).getId()+"_wname\" :[";
 						System.out.println(webProperties.getItems().size());
+						//defaultvalue += "\""+webProperties.getItems().get(0).getName() + "\",";
 						for(int j=0;j < webProperties.getItems().size(); j++){
 							
 							String firstWebProperties = webProperties.getItems().get(j).getId();
 							propId += "\"" + webProperties.getItems().get(j).getId() +"\","; 
+							
 							webProp += "\"" + webProperties.getItems().get(j).getName() +"\",";
 							System.out.println(webProperties.getItems().toString());
 							Profiles profile = analytics.management().profiles().list(firstAccountId, firstWebProperties).execute();
@@ -338,6 +343,8 @@ public String homeRedirect(HttpServletRequest req,ModelMap model){
 								
 								profileName += "\""+webProperties.getItems().get(j).getId()+"_pname\" :[";
 								profId += "\""+webProperties.getItems().get(j).getId()+"\" :[";
+								//defaultvalue += "\""+profile.getItems().get(0).getName() + "\",";
+								//defaultvalue += "\"ga:"+profile.getItems().get(0).getId() + "\",";
 								System.out.println(profile.getItems().size());
 								for(int k=0;k < profile.getItems().size();k++){
 									profileId = profile.getItems().get(k).getId();
@@ -355,6 +362,7 @@ public String homeRedirect(HttpServletRequest req,ModelMap model){
 						propId = propId.substring(0, propId.length()-1);
 						webProp += "],";
 						propId  += "],";
+					//	defaultvalue += "],";
 					}
 					
 				}
@@ -363,7 +371,9 @@ public String homeRedirect(HttpServletRequest req,ModelMap model){
 				accountName  += "],";
 				accountId += "],";
 		accountInfo = accountName + webProp + profileName+accountId+propId +profId;
+		//System.out.println(defaultvalue);
 		accountInfo ="{"+ accountInfo.substring(0, accountInfo.length()-1)+"}";
+		System.out.println(accountInfo);
 		
 		}
 		
