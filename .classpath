@@ -25,5 +25,6 @@
 	<classpathentry kind="lib" path="war/WEB-INF/lib/spring-webmvc-portlet-3.2.3.RELEASE.jar"/>
 	<classpathentry kind="con" path="com.google.gdt.eclipse.managedapis.MANAGED_API_CONTAINER/analytics-v3r79lv1.16.0-rc"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/google-api-services-oauth2-v2-rev51-1.17.0-rc.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/json-simple-1.1.1.jar"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>
