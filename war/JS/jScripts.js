@@ -33,6 +33,11 @@
                 	
                 })
                  .done(function(msg){
+                	 console.log("Msessage"+msg);
+                	 console.log(typeof msg);
+                	 if(!msg){
+                		 $('#accountName').append("<option value='0'>No account found</option>"); 
+                	 }
                 	 var json = jQuery.parseJSON(msg);                	 
                 		 console.log(json);
                     	 var accountName = [];
@@ -47,6 +52,7 @@
                          
                          $('#accountName').empty();  
                          $('#propName').empty();       
+                         
                          $('#tabl').empty();                                                                                                                                                                                                                                                                                                                                                                                                     
                          for(var index in accountName){
                            $('#accountName').append("<option value='"+index+"'>"+accountName[index]+"</option>");                  
