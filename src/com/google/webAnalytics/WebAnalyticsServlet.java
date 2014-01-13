@@ -77,6 +77,7 @@ public class WebAnalyticsServlet  {
 				userInfo = userService.userinfo().get().execute();
 				String emailid =  userInfo.getEmail();
 				HttpSession session=req.getSession(); 
+				
 				session.setAttribute("SESSION_USEREMAILID", emailid);
 				session.setAttribute("USER_ACCESSTOKEN", credential.getAccessToken());
 				session.setAttribute("USER_REFRESHTOKEN", credential.getRefreshToken());
@@ -85,6 +86,8 @@ public class WebAnalyticsServlet  {
 			//	storeCredential(emailid,credential);
 				
 				analytics = new Analytics.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).setApplicationName("Web Analytics").build();
+				Accounts account = analytics.management().accounts().list().execute();
+				log.info(account.getItems().get(0).getName());
 				//session.setAttribute("SESSION_OBJ" );
 				//session.setAttribute("USERCredential", analytics);
 				//storeAnalyticsObject(emailid,analytics.toString());
@@ -122,10 +125,18 @@ public class WebAnalyticsServlet  {
 
 
 @RequestMapping("/home")
-public String homeRedirect(HttpServletRequest req,ModelMap model){
+public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,ModelMap model){
 	HttpSession session =  req.getSession(false);
-	String urlLocation;
- 	if(session.getAttribute("SESSION_USEREMAILID") == null || session.getAttribute("SESSION_USEREMAILID") == ""){
+	String urlLocation = null;
+	if(session == null){
+    try {
+		resp.sendRedirect("/index.html");
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	}
+	else if(session.getAttribute("SESSION_USEREMAILID") == null || session.getAttribute("SESSION_USEREMAILID") == ""){
  		
  		urlLocation = "logout";
 		
@@ -303,16 +314,21 @@ public String homeRedirect(HttpServletRequest req,ModelMap model){
 			Accounts account = analytics.management().accounts().list().execute();
 			if(account.getItems().isEmpty()){
 			System.out.println("Sorry no Account founded");
+			System.err.println("Account name: "+account.getItems().get(0).getName());
+			log.info("No Account found");
 			}
 			else{
 				accountName += "\"AccountName\" : [";
 				accountId += "\"AccountId\" : [";
 				defaultvalue += "\"Defaultvalue\" :[";
 				defaultvalue += "\""+account.getItems().get(0).getName() + "\",";
+				log.info("you have a account, No of account" + account.getItems().size());
 				for(int i=0; i < account.getItems().size();i++){
 					System.out.println(account.getItems().get(i).getName());
 					//AccountName = account.getItems().get(i).getName();
 					accountName +="\"" + account.getItems().get(i).getName() +"\",";
+					log.info(account.getItems().get(i).getName());
+					System.err.println("Account nam: "+account.getItems().get(i).getName());
 					accountId += "\"" + account.getItems().get(i).getId() +"\",";
 					
 					String firstAccountId = account.getItems().get(i).getId();
