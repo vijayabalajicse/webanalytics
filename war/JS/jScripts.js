@@ -40,80 +40,22 @@
                 	 }
                 	 var json = jQuery.parseJSON(msg);                	 
                 		 console.log(json);
-                    	 var accountName = [];
-                    	 var accountId = [];
-                    	 var profileId= [];
-                    	 var propName;
-                    	 var profName;
-                    	 var loc;
-                    	 accountName = json.AccountName;   
-                         accountId = json.AccountId;
+                		 var accountName = [];
+                    	 
+                    	 accountName = json   
+                        console.log(accountName);
                   // script load data start  
                          
                          $('#accountName').empty();  
                          $('#propName').empty();       
                          
-                         $('#tabl').empty();                                                                                                                                                                                                                                                                                                                                                                                                     
+                         $('#tabl').empty();   
+                        var account_opt = " <option value=0>Select AccountName</option>";
                          for(var index in accountName){
-                           $('#accountName').append("<option value='"+index+"'>"+accountName[index]+"</option>");                  
+                        	 
+                        	 account_opt += "<option value='"+index+"'>"+accountName[index]+"</option>";                  
                          }
-                         
-                         propName = accountId[$('#accountName').val()]+"_wname"; 
-                         $('#propName').append("<option value='"+index+"'>"+json[propName][0]+"</option>");
-                         
-                         loc =accountId[$('#accountName').val()];
-                         var proploc =json[loc][0]+"_pname";
-                         console.log("account Id: "+loc);
-                         console.log($('#propName').val());
-                         console.log(proploc);
-                         console.log(json[proploc]);
-                         $('#profName').append("<option value='"+index+"'>"+json[proploc][0]+"</option>");
-                         
-                         var profName = accountId[0];
-                         console.log(profName);
-                         var profLocation = json[profName][0];
-                         console.log(json[profName]);
-                         $('#tabl').val("ga:"+ json[profLocation][0]);
-//                         propName = accountId[$('#accountName').val()]+"_wname";   
-//                         $('#propName').append("<option value='"+index+"'>"+json[propName][0]+"</option>");
-//                         loc =accountId[$('#accountName').val()];
-//                         var proploc =json[loc][$('#propName').val()]+"_pname";   
-//                         $('#profName').append("<option value='"+index+"'>"+json[proploc][0]+"</option>");   
-//                         var profName = accountId[$('#accountName').val()]; 
-//                    	 var profLocation = json[profName][$('#propName').val()];  
-//                    	 $('#tabl').val("ga:"+ json[profLocation][$('#profName').val()]);
-                                                                                                                                                                                                                                                                                                                                                                                                                      
-                         $('#accountName').click(function(){
-                         propName = accountId[$('#accountName').val()]+"_wname";
-                         console.log($('#accountName').val());      
-                         console.log(json[propName]);  
-                         $('#propName').empty();     
-                         $('#tabl').empty();                                                                                                                                                                                                                                                                                                                                                             
-                           for(var index in json[propName]){
-                             $('#propName').append("<option value='"+index+"'>"+json[propName][index]+"</option>");                                                                           
-                           }
-                        });                                                                                                                                                                                                                                                                                                                                                                                                     
-                                                                                                                                                                                                                                                                                                                                                                                                                      
-                         $('#propName').click(function(){
-                        	 loc =accountId[$('#accountName').val()];
-                        	 console.log($('#propName').val());
-                        	 console.log(json[loc]);
-                        	 var proploc =json[loc][$('#propName').val()]+"_pname";                                                                                                                                                                                                                                                                                                                                                                                                       
-                        	 $('#profName').empty();
-                        	 $('#tabl').empty();                                                                                                                                                                                                                                                                                                                                                                                                       
-                        	 for( var index in json[proploc]){
-                        		 $('#profName').append("<option value='"+index+"'>"+json[proploc][index]+"</option>");                                                                                                                                                                                                                                                                                                                                                                                                     
-                        	 }
-                         });
-                         $('#profName').click(function(){
-                        	 var profName = accountId[$('#accountName').val()];                                                                                                                                                                                                                                                                                                                                                                                                       
-                        	 //var tabl = json[profName];
-                        	 var profLocation = json[profName][$('#propName').val()];   
-                        	 console.log(json[profLocation][$('#profName').val()]);                                                                                                                                                                                                                                                                                                                                                                                                       
-                        	 $('#tabl').empty();                                                                                                                                                                                                                                                                                                                                                                                                       
-                        	 $('#tabl').val("ga:"+ json[profLocation][$('#profName').val()]);
-                         });
-                	                                                                                                                                                                                                                                                                                                                                                                                                        
+                         $('#accountName').append( account_opt);                                                                                                                                                                                                                                                                                                                                                                                           
                      
                      
               
@@ -121,6 +63,74 @@
                 	 
                 	 
                  }); 
+                
+                //accountName Changer to get properties
+                $('#accountName').change(function(){
+                	console.log("opertion property"+$('#accountName option:selected').val());
+                	var acc_data = $('#accountName option:selected').val();     
+                	var propeties =[];
+                	$('#propName').empty();  
+                	console.log(acc_data);
+                	$.ajax({
+                		type:"POST",
+                		url:"/getPropertyInfo",                  		
+                		data: acc_data
+                		
+                	})
+                	.done(function(msg){
+                		console.log(msg);
+                		var json_prop = jQuery.parseJSON(msg);
+                		console.log(json_prop);
+                		properties = json_prop; 
+                		var prop_opt = "<option value=0>Select Properties</option>";
+                		for( var index in properties){
+                			prop_opt +="<option value='"+index+"'>" + properties[index] + "</option>";
+                			console.log(index);
+                		}
+                		$('#propName').append(prop_opt);
+                	});
+                });
+                
+                // account change end
+                
+                //properties change event
+                $('#propName').change(function(){
+                	console.log("opertion property"+$('#accountName option:selected').val());
+                	console.log("opertion property"+$('#propName option:selected').val());
+                	var properties_data = {AccountId:$('#accountName option:selected').val(),PropertiesID:$('#propName option:selected').val()};               	
+                	properties_data = JSON.stringify(properties_data);
+                	console.log(properties_data);
+                	$("#profName").empty();
+                	var profileInfo =[];
+                	$.ajax({
+                		type:"POST",
+                		url:"/getProfileInfo",   
+                		dataType: "json",
+                		contentType : "application/json",	
+                		data: properties_data
+                		
+                	})
+                	.done(function(msg){
+                		console.log(msg);
+                		var json_prof = msg;
+                		console.log(json_prof);
+                		profileInfo = json_prof;
+                		var prof_opt= "<option value=0>Select ProfileName</option>";
+                		for( var index in  profileInfo){
+                			prof_opt += "<option value='" + index + "'>" + profileInfo[index] + "</option>";
+                		}
+                		$("#profName").append(prof_opt);
+                		//$('#tabl').val("ga:"+$('#profName').val());
+                		
+                	});
+                });
+                
+                //end properties changes
+                
+                //start to get profile Id
+                $('#profName').change(function(){
+                	$('#tabl').val("ga:"+$('#profName option:selected').val());
+                });
 	  
 	            $( ".datepicker" ).datepicker({ dateFormat: 'yy-mm-dd',maxDate: '+0D' });
 	            

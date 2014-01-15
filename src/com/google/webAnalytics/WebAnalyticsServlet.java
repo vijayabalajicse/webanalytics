@@ -4,13 +4,18 @@ package com.google.webAnalytics;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.servlet.http.*;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,6 +31,21 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeRequestUrl;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
@@ -58,6 +78,10 @@ public class WebAnalyticsServlet  {
     static HashSet<String> scopes = new HashSet<String>();
     static GoogleAuthorizationCodeRequestUrl url;
     String location;
+    Analytics analytics;
+    ObjectMapper jsonMap = new ObjectMapper();
+    JSONObject jsonObj = new JSONObject();
+	JSONParser parser = new JSONParser();
     
 	Logger log = Logger.getLogger("LogInfo");
 	static final String KIND = "AnalticsObject";
@@ -68,7 +92,7 @@ public class WebAnalyticsServlet  {
 		String code = req.getParameter("code");
 		Oauth2 userService;
 		Userinfo userInfo;	
-		Analytics analytics;
+		
 		if(req.getParameter("code") != null || req.getParameter("code") != ""){
 			   
 			credential = getCredential(code);
@@ -87,6 +111,7 @@ public class WebAnalyticsServlet  {
 				
 				analytics = new Analytics.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).setApplicationName("Web Analytics").build();
 				Accounts account = analytics.management().accounts().list().execute();
+			//	session.setAttribute("SessionGadate", account.);
 				log.info(account.getItems().get(0).getName());
 				//session.setAttribute("SESSION_OBJ" );
 				//session.setAttribute("USERCredential", analytics);
@@ -170,6 +195,74 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 		}
 		
 	}
+	
+	@RequestMapping("/getPropertyInfo")
+	public @ResponseBody String getPropertyInfo(@RequestBody String ajaxdata,HttpServletRequest req){
+		
+		String accessToken = (String) req.getSession().getAttribute("USER_ACCESSTOKEN");
+		Analytics analytics = getAnalayticsObj(accessToken);
+		Map propertiesInfo =  new LinkedHashMap();
+		String accountId =ajaxdata.substring(0, ajaxdata.length()-1);
+		String properties ="";
+		try {
+			Webproperties webProperties = analytics.management().webproperties().list(accountId).execute();
+			if(webProperties.getItems().isEmpty()){
+				System.out.println("No data found");
+			}else{
+				for (int i=0;i<webProperties.getItems().size();i++){
+				propertiesInfo.put(webProperties.getItems().get(i).getId(),webProperties.getItems().get(i).getName());
+				}
+				properties = jsonMap.writeValueAsString(propertiesInfo);
+				System.out.println(properties);
+			}
+				
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		 return properties;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@RequestMapping("/getProfileInfo")
+	public @ResponseBody String getProfileInfo(@RequestBody String propData,HttpServletRequest req){
+		Map profileMap = new LinkedHashMap();
+		String profileInfo ="";
+		System.out.println(propData);
+		try {
+			
+			jsonObj = (JSONObject) parser.parse(propData);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		System.out.println(jsonObj.get("AccountId"));
+		System.out.println(jsonObj.get("PropertiesID"));
+		String accountId = (String) jsonObj.get("AccountId");
+		String propertyId= (String) jsonObj.get("PropertiesID");
+		String accessToken = (String) req.getSession().getAttribute("USER_ACCESSTOKEN");
+		Analytics analytics = getAnalayticsObj(accessToken);
+		try {
+			Profiles profile = analytics.management().profiles().list(accountId, propertyId).execute();
+			if(profile.getItems().isEmpty()){
+				System.out.println("Empty");
+			}else{
+				for(int i=0;i< profile.getItems().size();i++){
+					profileMap.put(profile.getItems().get(i).getId(),profile.getItems().get(i).getName());
+				}
+				
+				profileInfo = jsonMap.writeValueAsString(profileMap);
+				System.out.println(profileInfo);
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		return profileInfo;
+	}
 
 	@RequestMapping("/logout")
 	public String logout(HttpServletRequest req, HttpServletResponse resp){
@@ -185,12 +278,12 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 		String accessToken = (String) req.getSession().getAttribute("USER_ACCESSTOKEN");
 		//String refreshcode = (String) req.getSession().getAttribute("USER_REFRESHTOKEN");
 		//long expiresMiliSeconds = (long) req.getSession().getAttribute("EXPIRES_MILISECOND");
-		System.out.println(accessToken + "   " );
-        Credential credential = new GoogleCredential.Builder().setClientSecrets(clientSecrets()).setJsonFactory(JSON_FACTORY).setTransport(HTTP_TRANSPORT).build();
-        credential.setAccessToken(accessToken);
+		//System.out.println(accessToken + "   " );
+      //  Credential credential = new GoogleCredential.Builder().setClientSecrets(clientSecrets()).setJsonFactory(JSON_FACTORY).setTransport(HTTP_TRANSPORT).build();
+       // credential.setAccessToken(accessToken);
       //  credential.setRefreshToken(refreshcode);
       //  credential.setExpirationTimeMilliseconds(expiresMiliSeconds);		
-		Analytics analytics = new Analytics.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).build();		
+	Analytics analytics = getAnalayticsObj(accessToken);	
 	//Analytics analytics_1 = (Analytics) req.getSession().getAttribute("SESSION_OBJ");	
 	System.out.println("Analytics obj: "+analytics);	
 	//System.out.println("Analytics client: " +analytics.getGoogleClientRequestInitializer());
@@ -231,7 +324,13 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 		
 		
 	}
-
+    private Analytics getAnalayticsObj(String accesstoken){
+    	Credential credential = new GoogleCredential.Builder().setClientSecrets(clientSecrets()).setJsonFactory(JSON_FACTORY).setTransport(HTTP_TRANSPORT).build();
+    	credential.setAccessToken(accesstoken);
+    	Analytics analytics = new Analytics.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).build();
+    	return analytics;
+    	
+    }
 
 	@RequestMapping("/getdataAjax")
 	public @ResponseBody String getData(@RequestBody String data,HttpServletRequest req) {
@@ -240,15 +339,15 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 		//String refreshcode = (String) req.getSession().getAttribute("USER_REFRESHTOKEN");
 	//	long expiresMiliSeconds = (long) req.getSession().getAttribute("EXPIRES_MILISECOND");
 		System.out.println(accessToken + "   " );
-        Credential credential = new GoogleCredential.Builder().setClientSecrets(clientSecrets()).setJsonFactory(JSON_FACTORY).setTransport(HTTP_TRANSPORT).build();
-        credential.setAccessToken(accessToken);
+      //  Credential credential = new GoogleCredential.Builder().setClientSecrets(clientSecrets()).setJsonFactory(JSON_FACTORY).setTransport(HTTP_TRANSPORT).build();
+       // credential.setAccessToken(accessToken);
        // credential.setRefreshToken(refreshcode);
       //  credential.setExpirationTimeMilliseconds(expiresMiliSeconds);		
-		Analytics analytics = new Analytics.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).build();	
+		Analytics analytics = getAnalayticsObj(accessToken);
 		//String table_id,metrics,dimension,startDate,endDate;
 		log.info("Parsing the data from clent");
-		JSONObject jsonObj = new JSONObject();
-		JSONParser parser = new JSONParser();
+		//JSONObject jsonObj = new JSONObject();
+		//JSONParser parser = new JSONParser();
 		String data_result = null;
 		try
 		{
@@ -306,9 +405,12 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 	private String getProfileId(Analytics analytics)  
 	{
 		log.info("Get profile info");
-		String profileId = null;
-		String accountInfo = null;
-		String accountName ="",webProp = "",profileName ="",profId="",accountId="",propId="",defaultvalue="";
+		Map accountNameInfo = new LinkedHashMap();
+		ObjectMapper jsonMap = new ObjectMapper();
+		List list = new ArrayList();
+		//String profileId = null;
+		String accountInfo = "";
+		//String accountName ="",webProp = "",profileName ="",profId="",accountId="",propId="",defaultvalue="";
 		try
 		{
 			Accounts account = analytics.management().accounts().list().execute();
@@ -318,78 +420,20 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 			log.info("No Account found");
 			}
 			else{
-				accountName += "\"AccountName\" : [";
-				accountId += "\"AccountId\" : [";
-				defaultvalue += "\"Defaultvalue\" :[";
-				defaultvalue += "\""+account.getItems().get(0).getName() + "\",";
-				log.info("you have a account, No of account" + account.getItems().size());
-				for(int i=0; i < account.getItems().size();i++){
-					System.out.println(account.getItems().get(i).getName());
-					//AccountName = account.getItems().get(i).getName();
-					accountName +="\"" + account.getItems().get(i).getName() +"\",";
-					log.info(account.getItems().get(i).getName());
-					System.err.println("Account nam: "+account.getItems().get(i).getName());
-					accountId += "\"" + account.getItems().get(i).getId() +"\",";
+				for ( int i =0; i< account.getItems().size();i++){
+					//accountNameInfo.put( "AccountName: ", "\""+i"\"");
+					accountNameInfo.put(account.getItems().get(i).getId(), account.getItems().get(i).getName());
 					
-					String firstAccountId = account.getItems().get(i).getId();
-					
-					Webproperties webProperties = analytics.management().webproperties().list(firstAccountId).execute();
-					if(webProperties.getItems().isEmpty())
-					{
-				    	System.out.println("No webproperties found for this account");
-					}
-					else{
-						propId  += "\""+account.getItems().get(i).getId()+"\" :[";
-						webProp += "\""+account.getItems().get(i).getId()+"_wname\" :[";
-						System.out.println(webProperties.getItems().size());
-						//defaultvalue += "\""+webProperties.getItems().get(0).getName() + "\",";
-						for(int j=0;j < webProperties.getItems().size(); j++){
-							
-							String firstWebProperties = webProperties.getItems().get(j).getId();
-							propId += "\"" + webProperties.getItems().get(j).getId() +"\","; 
-							
-							webProp += "\"" + webProperties.getItems().get(j).getName() +"\",";
-							System.out.println(webProperties.getItems().toString());
-							Profiles profile = analytics.management().profiles().list(firstAccountId, firstWebProperties).execute();
-							if(profile.getItems().isEmpty()){
-					        	System.out.println("No profile(view) found");
-					        	
-					        }
-							else{
-								
-								profileName += "\""+webProperties.getItems().get(j).getId()+"_pname\" :[";
-								profId += "\""+webProperties.getItems().get(j).getId()+"\" :[";
-								//defaultvalue += "\""+profile.getItems().get(0).getName() + "\",";
-								//defaultvalue += "\"ga:"+profile.getItems().get(0).getId() + "\",";
-								System.out.println(profile.getItems().size());
-								for(int k=0;k < profile.getItems().size();k++){
-									profileId = profile.getItems().get(k).getId();
-									profId  += "\"" + profile.getItems().get(k).getId() +"\",";
-									profileName += "\"" + profile.getItems().get(k).getName() +"\",";
-									System.out.println(profile.getItems().get(k).getName()); 
-								}
-								profId =profId.substring(0, profId.length()-1);
-								profileName = profileName.substring(0, profileName.length()-1);
-								profileName += "],";
-								profId  += "],";
-							}
-						}
-						webProp = webProp.substring(0, webProp.length()-1);
-						propId = propId.substring(0, propId.length()-1);
-						webProp += "],";
-						propId  += "],";
-					//	defaultvalue += "],";
-					}
-					
+					//list.add(account.getItems().get(i).getId(), account.getItems().get(i).getName());
+					//list.add(account.getItems().get(i).setId(id), element);
 				}
-				accountName = accountName.substring(0, accountName.length()-1);
-				accountId = accountId.substring(0, accountId.length()-1);
-				accountName  += "],";
-				accountId += "],";
-		accountInfo = accountName + webProp + profileName+accountId+propId +profId;
-		//System.out.println(defaultvalue);
-		accountInfo ="{"+ accountInfo.substring(0, accountInfo.length()-1)+"}";
-		System.out.println(accountInfo);
+				//list = account.getItems();
+				accountInfo = jsonMap.writeValueAsString(accountNameInfo);
+				System.out.println(accountInfo);
+			//	System.out.println(accountNameInfo.toString());
+				//System.out.println(list);
+				
+				
 		
 		}
 		

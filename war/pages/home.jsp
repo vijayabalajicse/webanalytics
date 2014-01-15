@@ -25,11 +25,14 @@
     <div class="form-group">
       <label class="control-label">Account Name &nbsp &nbsp </label>
       
-    <select class="form-control" id="accountName"></select>
+    <select class="form-control" id="accountName">
+   
+    </select>
     </div><br/>
      <div class="form-group">
       <label class="control-label" >Webproperties Name &nbsp &nbsp </label>
     <select class="form-control" id="propName"></select>
+    
     </div>
     <br/>
     <div class="form-group">
