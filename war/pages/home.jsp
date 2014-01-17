@@ -93,7 +93,8 @@
     </div>
     
   </div>
-  
+  hi
+  <input type = "button" value ="Email" id = "email" />
   <input type='button' value='Download' id='download' />
 <div id="tablechart" style="width:800px;height:500px;">
 </div>

@@ -20,12 +20,36 @@
 	var metrics = [];
 	var data;
       
-     
+   // load the Google Visualization api for chart  
   google.load("visualization", "1", {packages:["corechart","table"]}); 
 
    
   $(function()
 		    { 
+/** Email the data  */	  
+	  
+	  //email start point
+	  $('#email').click(function(){
+		  console.log("Email ready to send");
+		  console.log(chartData);
+		  $.ajax({
+			  type: "POST",
+			  url: "/emailRequest",
+			  contentType: "application/json",
+			  data: chartData
+			  	  
+		  })
+		  .done(function(msg){
+			  console.log(msg);
+		  });
+		  
+	  });
+	  
+	  //email end point
+	  
+	  
+/** Ajax for GetAccount Info on PageLoad
+Start Ajax for GetAccount Info on PageLoad  */
                 $.ajax({
                 	type:"GET",
                 	url:"/getAccountInfo",
@@ -44,7 +68,7 @@
                     	 
                     	 accountName = json   
                         console.log(accountName);
-                  // script load data start  
+                   
                          
                          $('#accountName').empty();  
                          $('#propName').empty();       
@@ -55,16 +79,12 @@
                         	 
                         	 account_opt += "<option value='"+index+"'>"+accountName[index]+"</option>";                  
                          }
-                         $('#accountName').append( account_opt);                                                                                                                                                                                                                                                                                                                                                                                           
-                     
-                     
-              
-              // script load data end  	 
-                	 
-                	 
+                         $('#accountName').append( account_opt);  
                  }); 
+ /** End Ajax for GetAccount Info on PageLoad  
                 
-                //accountName Changer to get properties
+ /** Get the Properties detail of coressponding Account
+ Start       */         
                 $('#accountName').change(function(){
                 	console.log("opertion property"+$('#accountName option:selected').val());
                 	var acc_data = $('#accountName option:selected').val();     

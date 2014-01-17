@@ -19,6 +19,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeRequestUrl;
@@ -36,17 +37,19 @@ import com.google.api.services.analytics.model.Profiles;
 import com.google.api.services.analytics.model.Webproperties;
 import com.google.api.services.oauth2.Oauth2;
 import com.google.api.services.oauth2.model.Userinfo;
+import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.QueueFactory;
+import com.google.appengine.api.taskqueue.TaskOptions;
 
 
 @Controller
-@RequestMapping("/")
+
 public class WebAnalyticsServlet  {
 	final static JacksonFactory JSON_FACTORY = new  JacksonFactory();
     final static HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
     static HashSet<String> scopes = new HashSet<String>();
     static GoogleAuthorizationCodeRequestUrl url;
-    String location;
-    Analytics analytics;
+    String location;    
     ObjectMapper jsonMap = new ObjectMapper();
     JSONObject jsonObj = new JSONObject();
 	JSONParser parser = new JSONParser();    
@@ -60,8 +63,7 @@ public class WebAnalyticsServlet  {
 		Oauth2 userService;
 		Userinfo userInfo;
 		HttpSession session;
-		String emailid;
-		Accounts account;
+		String emailid;		
 		
 		if(req.getParameter("code") != null || req.getParameter("code") != ""){			   
 			credential = getCredential(code);
@@ -74,11 +76,7 @@ public class WebAnalyticsServlet  {
 				session.setAttribute("USER_ACCESSTOKEN", credential.getAccessToken());
 				session.setAttribute("USER_REFRESHTOKEN", credential.getRefreshToken());
 				session.setAttribute("EXPIRES_MILISECOND", credential.getExpirationTimeMilliseconds());
-				session.setAttribute("USER_AUTH_CODE", code);				
-				analytics = new Analytics.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).setApplicationName("Web Analytics").build();
-				account= analytics.management().accounts().list().execute();			
-				log.info(account.getItems().get(0).getName());				
-				System.out.println("Analytics Obj: "+analytics);
+				session.setAttribute("USER_AUTH_CODE", code);	
 				System.out.println("Refresh token: "+ credential.getRefreshToken());
 				location = "redirect:/home";				
 
@@ -183,6 +181,17 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 		}
 		 return properties;
 	}
+	
+	//Handle Email url Request
+	@RequestMapping("/emailRequest")
+	public @ResponseBody String emailTask(@RequestBody String emailData, HttpServletRequest req){
+		System.out.println("EmailData"+emailData);
+		String emailid = (String) req.getSession().getAttribute("USER_ACCESSTOKEN");
+		Queue taskQueue = QueueFactory.getQueue("EmailQueue");
+		taskQueue.add(TaskOptions.Builder.withUrl("/sendemail").param("emailId", emailid).param("csvData", emailData));
+		return "success";
+	}
+	
 	
 	//Handle Ajax url request for get the Profile info
 	@RequestMapping("/getProfileInfo")
@@ -349,7 +358,7 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 		}
 		
 		}catch(Exception e){
-			System.err.println(e.getStackTrace());
+			System.out.println("Problem in getting Account details");
 		}
 		
 		return accountInfo;
