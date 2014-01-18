@@ -36,6 +36,7 @@
 			  type: "POST",
 			  url: "/emailRequest",
 			  contentType: "application/json",
+			  dataType: "json",
 			  data: chartData
 			  	  
 		  })

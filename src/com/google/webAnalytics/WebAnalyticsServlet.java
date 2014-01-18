@@ -160,10 +160,12 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 		String accountId;
 		String properties ="";
 		Map<String,String> propertiesInfo =  new LinkedHashMap<String,String>();
-		accessToken= (String) req.getSession().getAttribute("USER_ACCESSTOKEN");
+		accessToken= (String) req.getSession().getAttribute("SESSION_USEREMAILID");
 		analytics= getAnalayticsObj(accessToken);
 		System.out.println(ajaxdata);
-		accountId=ajaxdata.substring(0, ajaxdata.length()-1);		
+		System.out.println(ajaxdata.length());
+		accountId=ajaxdata.substring(0, ajaxdata.length()-1);	
+		System.out.println(accountId+""+accountId.length());
 		try {
 			 webProperties = analytics.management().webproperties().list(accountId).execute();
 			if(webProperties.getItems().isEmpty()){
@@ -178,6 +180,7 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 				
 		} catch (IOException e) {			
 			System.out.println("Problem in getting the WebProperties from Analytics");
+			e.printStackTrace();
 		}
 		 return properties;
 	}
@@ -187,6 +190,7 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 	public @ResponseBody String emailTask(@RequestBody String emailData, HttpServletRequest req){
 		System.out.println("EmailData"+emailData);
 		String emailid = (String) req.getSession().getAttribute("USER_ACCESSTOKEN");
+		System.out.println(emailid);
 		Queue taskQueue = QueueFactory.getQueue("EmailQueue");
 		taskQueue.add(TaskOptions.Builder.withUrl("/sendemail").param("emailId", emailid).param("csvData", emailData));
 		return "success";
