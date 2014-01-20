@@ -19,6 +19,7 @@
 	var dimen_val =[];
 	var metrics = [];
 	var data;
+	var queryString;
       
    // load the Google Visualization api for chart  
   google.load("visualization", "1", {packages:["corechart","table"]}); 
@@ -31,17 +32,17 @@
 	  //email start point
 	  $('#email').click(function(){
 		  console.log("Email ready to send");
-		  console.log(chartData);
+		  console.log(queryString);
 		  $.ajax({
 			  type: "POST",
 			  url: "/emailRequest",
 			  contentType: "application/json",
 			  dataType: "json",
-			  data: chartData
+			  data: queryString
 			  	  
 		  })
 		  .done(function(msg){
-			  console.log(msg);
+			  alert(msg);
 		  });
 		  
 	  });
@@ -206,8 +207,8 @@ Start Ajax for GetAccount Info on PageLoad  */
 					tbl_id = $('#tabl').val();
 					startDate = $('#startdate').val();
 					endDate = $('#enddate').val();
-					var str =  '{"tableid":"'+tbl_id + '","metrics":"' + metrics + '","dimension":"' + dimen_val + '","startDate":"' + startDate + '","endDate":"' + endDate + '"}' ;
-					console.log(str);
+					queryString =  '{"tableid":"'+tbl_id + '","metrics":"' + metrics + '","dimension":"' + dimen_val + '","startDate":"' + startDate + '","endDate":"' + endDate + '"}' ;
+					console.log(queryString);
 					
 					if($('#startdate').val() == '' || $('#tabl').val() == ''  || $('#metric_value').val() == '' || $('#dimension_val').val() == '' || $('#enddate').val() == '' ){
 					   
@@ -221,45 +222,45 @@ Start Ajax for GetAccount Info on PageLoad  */
 					        		 url : '/getdataAjax',
 					        		 
 					        		 contentType: "application/json",
-					       		     data : str
+					       		     data : queryString
 					       		  
 					     		  })
 								.done(function (msg) 
 					    		  { 
+									console.log(msg);
 									var outputvalue = jQuery.parseJSON(msg);
 									console.log(outputvalue);
-									console.log(outputvalue.columnHeaders.length);
+									console.log(outputvalue.cols.length);
 									columnName = [];
-									for(var i =0; i < outputvalue.columnHeaders.length; i++ )
+									for(var i =0; i < outputvalue.cols.length; i++ )
 							         {
-							            dataType[i] = outputvalue.columnHeaders[i].dataType;
-							            columnType[i] = outputvalue.columnHeaders[i].columnType;
-							             columnName[i] = outputvalue.columnHeaders[i].name;
+							            dataType[i] = outputvalue.cols[i].type;							            
+							             columnName[i] = outputvalue.cols[i].id;
 							           
-							         }       
+							         }    
 							         rowsValue = [];
-							         console.log("Row value: " + outputvalue.dataTable.rows);
-							         if(outputvalue.dataTable.rows == "undefined"){
+							         console.log("Row value: " + outputvalue.rows);
+							         if(outputvalue.rows == "undefined"){
 							        	$('#tablechart').html("No record found for this report");
 							        	console.log("undefined");
-							         }else if(outputvalue.dataTable.rows == null){
+							         }else if(outputvalue.rows == null){
 							        	 $('#tablechart').html("No record found for this report");
 							        	 console.log("null");
 							         }
-							         for(var i = 0; i < outputvalue.dataTable.rows.length ; i++)
+							         for(var i = 0; i < outputvalue.rows.length ; i++)
 							         {
 							           
 							            rowsValue[i] = new Array();
-							           for( var j=0; j < outputvalue.columnHeaders.length ; j++)
+							           for( var j=0; j < outputvalue.cols.length ; j++)
 							           {
 							            
-							             if(dataType[j] == 'STRING')
+							             if(dataType[j] == 'string')
 							             {
-							             rowsValue[i][j] =outputvalue.dataTable.rows[i].c[j].v;
+							             rowsValue[i][j] =outputvalue.rows[i].c[j].v;
 							             }
-							             else if(dataType[j] == 'INTEGER')
+							             else if(dataType[j] == 'number')
 							             {
-							             rowsValue[i][j] = eval( outputvalue.dataTable.rows[i].c[j].v );  
+							             rowsValue[i][j] = eval( outputvalue.rows[i].c[j].v );  
 							             }  
 							           }
 							          

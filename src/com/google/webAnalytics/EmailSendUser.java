@@ -1,6 +1,10 @@
 package com.google.webAnalytics;
 
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.activation.DataHandler;
@@ -17,38 +21,87 @@ import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
 import javax.servlet.http.HttpServletRequest;
 
+
+
+
+
+//import org.json.CDL;
+//import org.json.JSONArray;
+//import org.json.JSONException;
+//import org.json.JSONObject;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 
 public class EmailSendUser {
+	
+	JSONObject jsonObject = new JSONObject();
+	JSONObject tempObject = new JSONObject();
+	JSONParser jsonParser = new JSONParser();
+	JSONArray column,row,rowvalue;
+	String CSV ="";
 	@RequestMapping("/sendemail")
-	public static void emailSending(@RequestBody String emailid,@RequestBody String csvdata,HttpServletRequest req){
+	@ResponseBody
+	public void emailSending(HttpServletRequest req){
 		
 		String emailId;
 		String csvData;
-		
+		Map<Integer, List<String>> map = new HashMap();
+		List<String> list;
 		emailId= req.getParameter("emailId");
-		csvData = req.getParameter("csvdata");
-		System.out.println(emailId);
+		csvData =req.getParameter("csvData");
+		System.out.println("EmailId"+emailId);
 		System.out.println("data"+csvData);
+		StringBuilder mailData = new StringBuilder();		
+		try {
+			jsonObject = (JSONObject) jsonParser.parse(csvData);
+		} catch (ParseException e1) {
+			
+			System.out.println("Json Parseing error: "+ e1.getStackTrace());
+		}
+		column =  (JSONArray) jsonObject.get("cols");
+		row =  (JSONArray) jsonObject.get("rows");
+		
+		System.out.println(column.toJSONString());
+		
+		for(int k =0;k< column.size();k++ ){
+          tempObject = (JSONObject) column.get(k);
+          mailData.append(tempObject.get("id")+",");
+		}
+		mailData.append("\n\r");
+		rowvalue = new JSONArray();
+		for(int t= 0;t< row.size();t++){
+			tempObject = (JSONObject) row.get(t);
+			rowvalue = (JSONArray) tempObject.get("c");
+			for(int v=0;v<rowvalue.size();v++){
+				tempObject = (JSONObject) rowvalue.get(v);
+				mailData.append(tempObject.get("v")+",");
+			}
+			mailData.append("\n");
+		}
+		System.out.println(mailData.toString());
+
 		Properties properties = new Properties();
 		 Multipart multipart = new MimeMultipart();
-		 MimeBodyPart htmlBodyPart = new MimeBodyPart();
+	//	 MimeBodyPart htmlBodyPart = new MimeBodyPart();
 		 MimeBodyPart attachment = new MimeBodyPart();
 		 DataSource sourcedata;
 		Session session = Session.getDefaultInstance(properties);
-		byte[] attachmentData = csvData.getBytes();
+		byte[] attachmentData = mailData.toString().getBytes();
 		Message message = new MimeMessage(session);
 		try {
 			message.setFrom(new InternetAddress("vijaya.balaji@a-cti.com","Vijayabalaji"));
 			message.addRecipient(Message.RecipientType.TO, new InternetAddress(emailId,"Mr.User"));
 			message.setSubject("Analytics Account Gadata");
 			message.setText("Google Analytics data in the Body");
-			htmlBodyPart.setContent(message,"text/html"); 
-			multipart.addBodyPart(htmlBodyPart);
+			//htmlBodyPart.setContent(message,"text/html"); 
+			//multipart.addBodyPart(htmlBodyPart);
 			attachment.setFileName("user.csv");
 			sourcedata = new ByteArrayDataSource(attachmentData,"text/comma-separated-values");
 			attachment.setDataHandler(new DataHandler(sourcedata));
@@ -58,10 +111,10 @@ public class EmailSendUser {
 			
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("Problem in UnSupportedEncoding: "+ e.getStackTrace());
 		} catch (MessagingException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("Problem in Mailing : "+ e.getStackTrace());
 		}
 		
 		   

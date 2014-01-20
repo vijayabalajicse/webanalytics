@@ -4,6 +4,7 @@ package com.google.webAnalytics;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -54,8 +55,9 @@ public class WebAnalyticsServlet  {
     JSONObject jsonObj = new JSONObject();
 	JSONParser parser = new JSONParser();    
 	Logger log = Logger.getLogger("LogInfo");	
+	Date printTime = new Date();
 	
-	@RequestMapping("/oauth2callback")
+	@RequestMapping(value="/oauth2callback")
 	public String callback(HttpServletRequest req, HttpServletResponse resp,ModelMap model){
 		
 		Credential credential;
@@ -77,7 +79,7 @@ public class WebAnalyticsServlet  {
 				session.setAttribute("USER_REFRESHTOKEN", credential.getRefreshToken());
 				session.setAttribute("EXPIRES_MILISECOND", credential.getExpirationTimeMilliseconds());
 				session.setAttribute("USER_AUTH_CODE", code);	
-				System.out.println("Refresh token: "+ credential.getRefreshToken());
+				System.out.println(printTime+"Refresh token: "+ credential.getRefreshToken());
 				location = "redirect:/home";				
 
 			} catch (IOException e) {
@@ -114,7 +116,7 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 			try {
 				resp.sendRedirect("/index.html");
 			} catch (IOException e) {
-				System.out.println("Problem in response redirection");
+				System.out.println(printTime+"Problem in response redirection");
 			}
 		}
 		else if(session.getAttribute("SESSION_USEREMAILID") == null || session.getAttribute("SESSION_USEREMAILID") == ""){
@@ -132,11 +134,11 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 	private Credential getCredential(String code) {
 		GoogleTokenResponse tokenResponse;
 		try {			
-			System.out.println("Authorization code: "+code);
+			System.out.println(printTime+"Authorization code: "+code);
 			tokenResponse = new GoogleAuthorizationCodeTokenRequest(HTTP_TRANSPORT,JSON_FACTORY,clientSecrets().getWeb().getClientId(),clientSecrets().getWeb().getClientSecret(),code,clientSecrets().getWeb().getRedirectUris().get(0)).execute();
 			return new GoogleCredential.Builder().setClientSecrets(clientSecrets()).setJsonFactory(JSON_FACTORY).setTransport(HTTP_TRANSPORT).build().setAccessToken(tokenResponse.getAccessToken()).setRefreshToken(tokenResponse.getRefreshToken());
 		} catch (IOException e) {
-			System.out.println("Problem in sending code or creating credential object");
+			System.out.println(printTime+"Problem in sending code or creating credential object");
 		}
 		return null;
 	}
@@ -147,7 +149,7 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 		try {
 			response.sendRedirect(getBuildinLoginUrl());
 		} catch (IOException e) {			
-			System.out.println("Probelm in response redirection");
+			System.out.println(printTime+"Probelm in response redirection");
 		}
 		
 	}
@@ -160,10 +162,11 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 		String accountId;
 		String properties ="";
 		Map<String,String> propertiesInfo =  new LinkedHashMap<String,String>();
-		accessToken= (String) req.getSession().getAttribute("SESSION_USEREMAILID");
-		analytics= getAnalayticsObj(accessToken);
-		System.out.println(ajaxdata);
-		System.out.println(ajaxdata.length());
+		accessToken= (String) req.getSession().getAttribute("USER_ACCESSTOKEN");
+		analytics= getAnalayticsObject(accessToken);
+		
+		System.out.println(printTime+ajaxdata);
+		System.out.println(printTime + ""+ajaxdata.length());
 		accountId=ajaxdata.substring(0, ajaxdata.length()-1);	
 		System.out.println(accountId+""+accountId.length());
 		try {
@@ -188,11 +191,13 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 	//Handle Email url Request
 	@RequestMapping("/emailRequest")
 	public @ResponseBody String emailTask(@RequestBody String emailData, HttpServletRequest req){
-		System.out.println("EmailData"+emailData);
-		String emailid = (String) req.getSession().getAttribute("USER_ACCESSTOKEN");
+		String getDataTable;
+		System.out.println("EmailData: "+emailData);
+		String emailid = (String) req.getSession().getAttribute("SESSION_USEREMAILID");
 		System.out.println(emailid);
+		getDataTable = getGaData(emailData,req);
 		Queue taskQueue = QueueFactory.getQueue("EmailQueue");
-		taskQueue.add(TaskOptions.Builder.withUrl("/sendemail").param("emailId", emailid).param("csvData", emailData));
+		taskQueue.add(TaskOptions.Builder.withUrl("/sendemail").param("emailId", emailid).param("csvData", getDataTable));
 		return "success";
 	}
 	
@@ -218,7 +223,7 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 		accountId  = (String) jsonObj.get("AccountId");
 		propertyId = (String) jsonObj.get("PropertiesID");
 		accessToken = (String) req.getSession().getAttribute("USER_ACCESSTOKEN");
-		analytics = getAnalayticsObj(accessToken);
+		analytics = getAnalayticsObject(accessToken);
 		try {
 			 profile = analytics.management().profiles().list(accountId, propertyId).execute();
 				if(profile.getItems().isEmpty()){
@@ -254,8 +259,8 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 	public @ResponseBody String getAccountInfo(HttpServletRequest req){
 		log.info("return the acccountinfo");
 		String accessToken = (String) req.getSession().getAttribute("USER_ACCESSTOKEN");			
-		Analytics analytics = getAnalayticsObj(accessToken);	
-		System.out.println("Analytics obj: "+analytics);	
+		Analytics analytics = getAnalayticsObject(accessToken);	
+		//System.out.println("Analytics obj: "+analytics);	
 		String 	accountInfo = getAccountInfo(analytics);
 	 return accountInfo;	
 	}
@@ -264,25 +269,36 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 
 	
 	//Creating the Analytics Object 
-    private Analytics getAnalayticsObj(String accesstoken){
+    private Analytics getAnalayticsObject(String accesstoken){
     	Credential credential = new GoogleCredential.Builder().setClientSecrets(clientSecrets()).setJsonFactory(JSON_FACTORY).setTransport(HTTP_TRANSPORT).build();
     	credential.setAccessToken(accesstoken);
+    	//System.out.println("credentil accesstoken"+credential.getAccessToken());
     	Analytics analytics = new Analytics.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).setApplicationName("Web Anlaytics").build();
+    	//System.out.println("Analytics obj"+analytics.getRootUrl()+""+analytics.getBaseUrl());
     	return analytics;
     	
     }
 
 	@RequestMapping("/getdataAjax")
-	public @ResponseBody String getData(@RequestBody String data,HttpServletRequest req) {
+	public @ResponseBody String getData(@RequestBody String data,HttpServletRequest req) {		
+		String responseData;		
+		responseData = getGaData(data,req);
+		return responseData;		
 		
+	}
+	
+	//Sending data with queryInformation and analytics obj
+	private String getGaData(String QueryData,HttpServletRequest req){
+		JSONObject objJson= new JSONObject();
+		String dataTablevalue = null;
 		String accessToken = (String) req.getSession().getAttribute("USER_ACCESSTOKEN");	
 		System.out.println("Accesstoken"+accessToken);      	
-		Analytics analytics = getAnalayticsObj(accessToken);		
+		Analytics analytics = getAnalayticsObject(accessToken);		
 		log.info("Parsing the data from clent");		
 		String data_result = null;
 		try
 		{
-		jsonObj = (JSONObject) parser.parse(data);		
+		jsonObj = (JSONObject) parser.parse(QueryData);		
 		}
 		catch(ParseException e)
 		{
@@ -295,9 +311,19 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 		String endDate =  (String) jsonObj.get("endDate");
 		System.out.println(table_id + " " + metrics + " " + dimension + " " + startDate + " " + endDate);
 		data_result = getResultsData(table_id,metrics,dimension,startDate,endDate,analytics);
-		//System.out.println(data_result);
+		System.out.println(data_result);
+		try {
+			jsonObj = (JSONObject) parser.parse(data_result);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		objJson =  (JSONObject) jsonObj.get("dataTable");
 		
-		return data_result;
+		dataTablevalue = objJson.toJSONString();
+		System.out.println(dataTablevalue);
+		return dataTablevalue ;
+		
 		
 	}
 	

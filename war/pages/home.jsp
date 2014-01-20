@@ -45,6 +45,21 @@
     <input type="text" placeholder="Select the Profile Name" id="tabl" required>
     </div>
     <br/>
+      <div class="form-group">
+      <label class="control-label">Dimension &nbsp&nbsp </label>
+    <input type="text" placeholder="Select the Dimesion Name" id='dimension_val' required>
+      <select multiple class="form-control" id='dimension'>
+         <option>ga:visitCount</option>
+        <option>ga:visitorType</option>
+        <option>ga:visitLength</option>
+        <option>ga:hostname</option>
+        <option>ga:pageTitle</option>
+        <option>ga:exitPagePath</option>
+        <option>ga:secondPagePath</option>
+        <option>ga:country</option>
+        <option>ga:subContinent</option>
+      </select>
+    </div><br/>
     <div class="form-group">
      <label class="control-label">Metrics &nbsp&nbsp </label>
     <input type="text" placeholder="Select the Dimesion Name" id='metric_value' required>
@@ -62,21 +77,21 @@
     </div>
     <br/>
     <div class="form-group">
-      <label class="control-label">Dimension &nbsp&nbsp </label>
-    <input type="text" placeholder="Select the Dimesion Name" id='dimension_val' required>
-      <select multiple class="form-control" id='dimension'>
-         <option>ga:visitCount</option>
-        <option>ga:visitorType</option>
-        <option>ga:visitLength</option>
-        <option>ga:hostname</option>
-        <option>ga:pageTitle</option>
-        <option>ga:exitPagePath</option>
-        <option>ga:secondPagePath</option>
-        <option>ga:country</option>
-        <option>ga:subContinent</option>
-      </select>
-    </div><br/>
-    
+      <label class="control-label" >Segment &nbsp&nbsp </label>
+    <input type="text" id="segment" required>
+    </div>
+    <br/>
+    <div class="form-group">
+      <label class="control-label" >Filter &nbsp&nbsp </label>
+    <input type="text" id="filter" required>
+    </div>
+    <br/>
+    <div class="form-group">
+      <label class="control-label" >Sort &nbsp&nbsp </label>
+    <input type="text" id="sort" required>
+    </div>
+    <br/>
+    <br/>
     <div class="form-group">
       <label class="control-label" >StartDate &nbsp&nbsp </label>
     <input type="text"  class="datepicker" id="startdate" required>
