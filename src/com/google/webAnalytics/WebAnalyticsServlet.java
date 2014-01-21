@@ -56,6 +56,7 @@ public class WebAnalyticsServlet  {
 	JSONParser parser = new JSONParser();    
 	Logger log = Logger.getLogger("LogInfo");	
 	Date printTime = new Date();
+	static GoogleClientSecrets clientSecrets = clientSecrets();
 	
 	@RequestMapping(value="/oauth2callback")
 	public String callback(HttpServletRequest req, HttpServletResponse resp,ModelMap model){
@@ -65,8 +66,7 @@ public class WebAnalyticsServlet  {
 		Oauth2 userService;
 		Userinfo userInfo;
 		HttpSession session;
-		String emailid;		
-		
+		String emailid;			
 		if(req.getParameter("code") != null || req.getParameter("code") != ""){			   
 			credential = getCredential(code);
 			userService = new Oauth2.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).setApplicationName("Web Analytics").build();
@@ -135,8 +135,8 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 		GoogleTokenResponse tokenResponse;
 		try {			
 			System.out.println(printTime+"Authorization code: "+code);
-			tokenResponse = new GoogleAuthorizationCodeTokenRequest(HTTP_TRANSPORT,JSON_FACTORY,clientSecrets().getWeb().getClientId(),clientSecrets().getWeb().getClientSecret(),code,clientSecrets().getWeb().getRedirectUris().get(0)).execute();
-			return new GoogleCredential.Builder().setClientSecrets(clientSecrets()).setJsonFactory(JSON_FACTORY).setTransport(HTTP_TRANSPORT).build().setAccessToken(tokenResponse.getAccessToken()).setRefreshToken(tokenResponse.getRefreshToken());
+			tokenResponse = new GoogleAuthorizationCodeTokenRequest(HTTP_TRANSPORT,JSON_FACTORY,clientSecrets.getWeb().getClientId(),clientSecrets.getWeb().getClientSecret(),code,clientSecrets.getWeb().getRedirectUris().get(0)).execute();
+			return new GoogleCredential.Builder().setClientSecrets(clientSecrets).setJsonFactory(JSON_FACTORY).setTransport(HTTP_TRANSPORT).build().setAccessToken(tokenResponse.getAccessToken()).setRefreshToken(tokenResponse.getRefreshToken());
 		} catch (IOException e) {
 			System.out.println(printTime+"Problem in sending code or creating credential object");
 		}
@@ -270,7 +270,7 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 	
 	//Creating the Analytics Object 
     private Analytics getAnalayticsObject(String accesstoken){
-    	Credential credential = new GoogleCredential.Builder().setClientSecrets(clientSecrets()).setJsonFactory(JSON_FACTORY).setTransport(HTTP_TRANSPORT).build();
+    	Credential credential = new GoogleCredential.Builder().setClientSecrets(clientSecrets).setJsonFactory(JSON_FACTORY).setTransport(HTTP_TRANSPORT).build();
     	credential.setAccessToken(accesstoken);
     	//System.out.println("credentil accesstoken"+credential.getAccessToken());
     	Analytics analytics = new Analytics.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).setApplicationName("Web Anlaytics").build();
@@ -294,7 +294,8 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 		String accessToken = (String) req.getSession().getAttribute("USER_ACCESSTOKEN");	
 		System.out.println("Accesstoken"+accessToken);      	
 		Analytics analytics = getAnalayticsObject(accessToken);		
-		log.info("Parsing the data from clent");		
+		log.info("Parsing the data from clent");
+		System.out.println("Query data"+QueryData);
 		String data_result = null;
 		try
 		{
@@ -312,17 +313,20 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 		System.out.println(table_id + " " + metrics + " " + dimension + " " + startDate + " " + endDate);
 		data_result = getResultsData(table_id,metrics,dimension,startDate,endDate,analytics);
 		System.out.println(data_result);
-		try {
+		try {			
 			jsonObj = (JSONObject) parser.parse(data_result);
-		} catch (ParseException e) {
+			objJson =  (JSONObject) jsonObj.get("dataTable");
+			data_result = objJson.toJSONString();
+			System.out.println(data_result);
+			
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("json Parsing error");
 		}
-		objJson =  (JSONObject) jsonObj.get("dataTable");
 		
-		dataTablevalue = objJson.toJSONString();
-		System.out.println(dataTablevalue);
-		return dataTablevalue ;
+		
+		
+		return data_result ;
 		
 		
 	}
@@ -335,11 +339,12 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 		String value = null;
 		try {
 		value = analytics.data().ga().get(table_id, startDate, endDate, metrics).setDimensions(dimension).setOutput("dataTable").setMaxResults(50).execute().toPrettyString();
-		} catch (IOException e) {
+		return value;
+		} catch (Exception e) {
 		
-		value = "no data found";
+		return e.getMessage();
 		}
-	return value;
+	
 	}
 	
 	//Getting Client Secrects form  json file
@@ -357,7 +362,7 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 	static private String getBuildinLoginUrl() {		
 		scopes.add(AnalyticsScopes.ANALYTICS_READONLY);
         scopes.add("https://www.googleapis.com/auth/userinfo.email");
-        url = new GoogleAuthorizationCodeRequestUrl(clientSecrets().getWeb().getClientId(),clientSecrets().getWeb().getRedirectUris().get(0),scopes).setAccessType("offline");
+        url = new GoogleAuthorizationCodeRequestUrl(clientSecrets.getWeb().getClientId(),clientSecrets.getWeb().getRedirectUris().get(0),scopes).setAccessType("offline");
 		return url.build();
 	}
 	

@@ -47,6 +47,9 @@
 		  
 	  });
 	  
+	  
+	  
+	  
 	  //email end point
 	  
 	  
@@ -156,54 +159,54 @@ Start Ajax for GetAccount Info on PageLoad  */
 	  
 	            $( ".datepicker" ).datepicker({ dateFormat: 'yy-mm-dd',maxDate: '+0D' });
 	            
-	            $("#metrics").focusout(function(){
-	            	$('#metric_value').val('');
-	            	metrics.length = 0;
-	            	
-	            	$("#metrics :selected").each(function(i,selected)
-	  		    		  {
-	  		     			 metrics[i] = $(selected).text();     
-	  		               });
-	  		      
-	  						console.log(metrics); 
-	  						if(metrics.length > 7)
-    						{
-    							alert("Max 7 Selection");
-    						}
-    						else
-    						{
-    							$('#metric_value').val(metrics);
-    						}
-	  						
-	  		      
-	  					
-	            	
-	            });
+//	            $("#metrics").focusout(function(){
+//	            	$('#metric_value').val('');
+//	            	metrics.length = 0;
+//	            	
+//	            	$("#metrics :selected").each(function(i,selected)
+//	  		    		  {
+//	  		     			 metrics[i] = $(selected).text();     
+//	  		               });
+//	  		      
+//	  						console.log(metrics); 
+//	  						if(metrics.length > 7)
+//    						{
+//    							alert("Max 7 Selection");
+//    						}
+//    						else
+//    						{
+//    							$('#metric_value').val(metrics);
+//    						}
+//	  						
+//	  		      
+//	  					
+//	            	
+//	            });
 	           
-	            $("#dimension").focusout(function(){
-	            	$('#dimension_val').val('');
-	            	dimen_val = [];
-	            	$("#dimension :selected").each(function(i,selected)
-	    		    		{
-	    		      			dimen_val[i] = $(selected).text();     
-	    		            });
-	    		      
-	    						console.log(dimen_val); 
-	    		      
-	    						if(dimen_val.length > 5)
-	    						{
-	    							alert("Max 7 Selection");
-	    						}
-	    						else
-	    						{
-	    							$('#dimension_val').val(dimen_val);
-	    						}
-	            	
-	            });
+//	            $("#dimension").focusout(function(){
+//	            	$('#dimension_val').val('');
+//	            	dimen_val = [];
+//	            	$("#dimension :selected").each(function(i,selected)
+//	    		    		{
+//	    		      			dimen_val[i] = $(selected).text();     
+//	    		            });
+//	    		      
+//	    						console.log(dimen_val); 
+//	    		      
+//	    						if(dimen_val.length > 5)
+//	    						{
+//	    							alert("Max 7 Selection");
+//	    						}
+//	    						else
+//	    						{
+//	    							$('#dimension_val').val(dimen_val);
+//	    						}
+//	            	
+//	            });
 	              
 				$('#getdata').click(function()
-				{   
-					
+				{   dimen_val = $('#dimension_val').val();
+					metrics = $('#metric_value').val();
 					tbl_id = $('#tabl').val();
 					startDate = $('#startdate').val();
 					endDate = $('#enddate').val();

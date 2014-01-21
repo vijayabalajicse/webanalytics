@@ -13,13 +13,24 @@
   <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
   <script type="text/javascript" src="https://www.google.com/jsapi"></script>
   <script type="text/javascript" src="/JS/jScripts.js"></script>
+  <script type="text/javascript" src="/JS/util.js"></script>
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-47321332-1', 'analytics-demo-work.appspot.com');
+  ga('send', 'pageview');
+
+</script>
   <link rel="stylesheet" href="/css/style.css">
   
 </head>
 <body>
    <div id="Header">
    You are Authorized as 
-   <%= session.getAttribute("SESSION_USEREMAILID") %> <a href="/logout">Logout</a>
+  <span onload= "_gaq.push(['_trackEvent', 'UserLoged', 'UserEmailid', this.value]);"> <%= session.getAttribute("SESSION_USEREMAILID") %> </span><a href="/logout">Logout</a>
    </div>
   <div class="form-horizontal">
     <div class="form-group">
@@ -47,33 +58,11 @@
     <br/>
       <div class="form-group">
       <label class="control-label">Dimension &nbsp&nbsp </label>
-    <input type="text" placeholder="Select the Dimesion Name" id='dimension_val' required>
-      <select multiple class="form-control" id='dimension'>
-         <option>ga:visitCount</option>
-        <option>ga:visitorType</option>
-        <option>ga:visitLength</option>
-        <option>ga:hostname</option>
-        <option>ga:pageTitle</option>
-        <option>ga:exitPagePath</option>
-        <option>ga:secondPagePath</option>
-        <option>ga:country</option>
-        <option>ga:subContinent</option>
-      </select>
+    <input type="text" placeholder="Select the Dimesion Name" id='dimension_val' required>     
     </div><br/>
     <div class="form-group">
      <label class="control-label">Metrics &nbsp&nbsp </label>
-    <input type="text" placeholder="Select the Dimesion Name" id='metric_value' required>
-      <select multiple class="form-control" id='metrics'>
-       <option>ga:newVisits</option>
-    <option>ga:visits</option>
-    <option>ga:visitors</option>
-    <option>ga:bounces</option>
-    <option>ga:avgTimeOnSite</option>
-    <option>ga:pageValue</option>
-    <option>ga:entrances</option>
-    <option>ga:pageviews</option>
-    <option>ga:timeOnPage</option>
-      </select>
+    <input type="text" placeholder="Select the Dimesion Name" id='metric_value' required>      
     </div>
     <br/>
     <div class="form-group">
@@ -107,8 +96,7 @@
        <button type="button" class="btn btn-info"  id='getdata'>Get Data</button>
     </div>
     
-  </div>
-  hi
+  </div>  
   <input type = "button" value ="Email" id = "email" />
   <input type='button' value='Download' id='download' />
 <div id="tablechart" style="width:800px;height:500px;">
