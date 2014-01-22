@@ -32,6 +32,7 @@ import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.analytics.Analytics;
+import com.google.api.services.analytics.Analytics.Data.Ga.Get;
 import com.google.api.services.analytics.AnalyticsScopes;
 import com.google.api.services.analytics.model.Accounts;
 import com.google.api.services.analytics.model.Profiles;
@@ -310,10 +311,14 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 		String dimension = (String) jsonObj.get("dimension");
 		String startDate =  (String) jsonObj.get("startDate");
 		String endDate =  (String) jsonObj.get("endDate");
-		System.out.println(table_id + " " + metrics + " " + dimension + " " + startDate + " " + endDate);
-		data_result = getResultsData(table_id,metrics,dimension,startDate,endDate,analytics);
-		System.out.println(data_result);
+		String segment = (String) jsonObj.get("segment");
+		String filter = (String) jsonObj.get("filter");
+		String sort = (String) jsonObj.get("sort");
+		System.out.println(table_id + " " + metrics + " " + dimension.length() + " " + startDate + " " + endDate+" "+filter.length()+" "+ segment.length()+" "+sort.length());
+		
 		try {			
+			data_result = getResultsData(table_id,metrics,dimension,startDate,endDate,filter,segment,sort,analytics);
+			System.out.println(data_result);
 			jsonObj = (JSONObject) parser.parse(data_result);
 			objJson =  (JSONObject) jsonObj.get("dataTable");
 			data_result = objJson.toJSONString();
@@ -332,17 +337,32 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 	}
 	
 	//Getting the GaData from Anlaytics
-	private String getResultsData(String table_id, String metrics,String dimension, String startDate, String endDate,Analytics analytics) 
+	private String getResultsData(String table_id, String metrics,String dimension, String startDate, String endDate,String filter, String segment, String sort, Analytics analytics) 
 	{
 	
-	log.info("Get the result for analytics");
+		log.info("Get the result for analytics");
 		String value = null;
+		Get apiQuery;
 		try {
-		value = analytics.data().ga().get(table_id, startDate, endDate, metrics).setDimensions(dimension).setOutput("dataTable").setMaxResults(50).execute().toPrettyString();
-		return value;
-		} catch (Exception e) {
-		
-		return e.getMessage();
+		//value = analytics.data().ga().get(table_id, startDate, endDate, metrics).setDimensions(dimension).setSegment(segment).setFilters(filter).setSort(sort).setOutput("dataTable").setMaxResults(50).execute().toPrettyString();
+			apiQuery = analytics.data().ga().get(table_id, startDate, endDate, metrics);
+			if(dimension.length() !=0){
+				 apiQuery.setDimensions(dimension);
+			 }
+			if(filter.length()!=0){
+				apiQuery.setFilters(filter);
+			}
+			if(segment.length()!=0){
+				apiQuery.setSegment(segment);
+			}
+			if(sort.length()!=0){
+				apiQuery.setSort(sort);
+			}
+			value = apiQuery.setOutput("dataTable").setMaxResults(50).execute().toPrettyString();
+			return value;
+		} catch (Exception e) {	
+			System.out.println(e);
+			return e.getMessage();
 		}
 	
 	}

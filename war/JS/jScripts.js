@@ -16,10 +16,13 @@
     var loc;
     var chartData=[];
     var tbl_id,endDate,startDate;
-	var dimen_val =[];
-	var metrics = [];
+	var dimension;
+	var metrics;
 	var data;
 	var queryString;
+	var filter;
+	var segment;
+	var sort;
       
    // load the Google Visualization api for chart  
   google.load("visualization", "1", {packages:["corechart","table"]}); 
@@ -205,93 +208,155 @@ Start Ajax for GetAccount Info on PageLoad  */
 //	            });
 	              
 				$('#getdata').click(function()
-				{   dimen_val = $('#dimension_val').val();
-					metrics = $('#metric_value').val();
+				{  
 					tbl_id = $('#tabl').val();
+					dimension = $('#dimension_val').val();
+					metrics = $('#metric_value').val();
+					segment = $('#segment').val();
+					filter =  $('#filter').val();
+					sort = $('#sort').val();
 					startDate = $('#startdate').val();
 					endDate = $('#enddate').val();
-					queryString =  '{"tableid":"'+tbl_id + '","metrics":"' + metrics + '","dimension":"' + dimen_val + '","startDate":"' + startDate + '","endDate":"' + endDate + '"}' ;
+					console.log(metrics.lastIndexOf(','));
+					console.log(metrics.length-1);
+					if(metrics.lastIndexOf(',')==metrics.length-1){
+						metrics = metrics.substring(0,metrics.length-1);
+						console.log(metrics);
+					}
+					if(dimension.lastIndexOf(',')==dimension.length-1){
+						dimension = dimension.substring(0,dimension.length-1);
+						console.log(dimension);
+					}
+					queryString =  '{"tableid":"'+tbl_id + '","metrics":"' + metrics + '","dimension":"' + dimension + '","startDate":"' + startDate + '","endDate":"' + endDate + '","filter":"'+filter+'","segment":"'+segment+'","sort":"'+sort+'"}' ;
 					console.log(queryString);
 					
-					if($('#startdate').val() == '' || $('#tabl').val() == ''  || $('#metric_value').val() == '' || $('#dimension_val').val() == '' || $('#enddate').val() == '' ){
+					
+					
+					if($('#startdate').val() == '' || $('#tabl').val() == ''  || $('#metric_value').val() == '' || $('#enddate').val() == '' ){
 					   
 						alert("Please Enter All the value");
 						
 					}else{
-					
-						$.ajax(
-					    		  {
-					       			 type : 'POST',
-					        		 url : '/getdataAjax',
-					        		 
-					        		 contentType: "application/json",
-					       		     data : queryString
-					       		  
-					     		  })
-								.done(function (msg) 
-					    		  { 
-									console.log(msg);
-									var outputvalue = jQuery.parseJSON(msg);
-									console.log(outputvalue);
-									console.log(outputvalue.cols.length);
-									columnName = [];
-									for(var i =0; i < outputvalue.cols.length; i++ )
-							         {
-							            dataType[i] = outputvalue.cols[i].type;							            
-							             columnName[i] = outputvalue.cols[i].id;
-							           
-							         }    
-							         rowsValue = [];
-							         console.log("Row value: " + outputvalue.rows);
-							         if(outputvalue.rows == "undefined"){
-							        	$('#tablechart').html("No record found for this report");
-							        	console.log("undefined");
-							         }else if(outputvalue.rows == null){
-							        	 $('#tablechart').html("No record found for this report");
-							        	 console.log("null");
-							         }
-							         for(var i = 0; i < outputvalue.rows.length ; i++)
-							         {
-							           
-							            rowsValue[i] = new Array();
-							           for( var j=0; j < outputvalue.cols.length ; j++)
-							           {
-							            
-							             if(dataType[j] == 'string')
-							             {
-							             rowsValue[i][j] =outputvalue.rows[i].c[j].v;
-							             }
-							             else if(dataType[j] == 'number')
-							             {
-							             rowsValue[i][j] = eval( outputvalue.rows[i].c[j].v );  
-							             }  
-							           }
-							          
-							           
-							        }
-							        
-									console.log("column count: "+ columnName.length);
-									console.log("Row count: " + rowsValue.length );
-									console.log("column : "+ columnName);
-									console.log("Row : " + rowsValue );
-									console.log("Row count: " + chartData.length );
-									chartData.length = 0 ;
-									console.log("chartdata count: " + chartData );
-									chartData = [ columnName ];
-									for( var index in rowsValue ) 
-									{
-										chartData.push( rowsValue[index] );
-									}
-									console.log(rowsValue.length)
-									console.log(chartData);
-							        console.log( chartData.length ); 
-							        display(chartData);
+					      //if()
+						console.log(dimension.substring(0,3));
+						if(dimension.substring(0,3) =="ga:" || metrics.substring(0,3) =="ga:"  || filter.substring(0,3) =="ga:"  || sort.substring(0,3) =="ga:" )
+							{
+							//ajax started
+							$.ajax(
+						    		  {
+						       			 type : 'POST',
+						        		 url : '/getdataAjax',
+						        		 
+						        		 contentType: "application/json",
+						       		     data : queryString
+						       		  
+						     		  })
+									.done(function (msg) 
+						    		  { 
+										console.log(msg);	
+										try{
+										var outputvalue = jQuery.parseJSON(msg);
+										console.log(outputvalue);
+										console.log(outputvalue.message);
+										console.log(outputvalue.cols.length);
+										columnName = [];
+										for(var i =0; i < outputvalue.cols.length; i++ )
+								         {
+								            dataType[i] = outputvalue.cols[i].type;							            
+								             columnName[i] = outputvalue.cols[i].id;
+								           
+								         }    
+								         rowsValue = [];
+								         console.log("Row value: " + outputvalue.rows);
+								         if(outputvalue.rows == "undefined"){
+								        	$('#tablechart').html("No record found for this report");
+								        	console.log("undefined");
+								         }else if(outputvalue.rows == null){
+								        	 $('#tablechart').html("No record found for this report");
+								        	 console.log("null");
+								         }
+								         for(var i = 0; i < outputvalue.rows.length ; i++)
+								         {
+								           
+								            rowsValue[i] = new Array();
+								           for( var j=0; j < outputvalue.cols.length ; j++)
+								           {
+								            
+								             if(dataType[j] == 'string')
+								             {
+								             rowsValue[i][j] =outputvalue.rows[i].c[j].v;
+								             }
+								             else if(dataType[j] == 'number')
+								             {
+								             rowsValue[i][j] = eval( outputvalue.rows[i].c[j].v );  
+								             }  
+								           }
+								          
+								           
+								        }
+								        
+										console.log("column count: "+ columnName.length);
+										console.log("Row count: " + rowsValue.length );
+										console.log("column : "+ columnName);
+										console.log("Row : " + rowsValue );
+										console.log("Row count: " + chartData.length );
+										chartData.length = 0 ;
+										console.log("chartdata count: " + chartData );
+										chartData = [ columnName ];
+										for( var index in rowsValue ) 
+										{
+											chartData.push( rowsValue[index] );
+										}
+										console.log(rowsValue.length)
+										console.log(chartData);
+								        console.log( chartData.length ); 
+								        display(chartData);
 
-									
-									
-					      			$('#output').html(msg);
-					      
-					      		  });
+										
+										
+						      			$('#output').html(msg);
+										}
+										catch(e){
+											console.log(msg);
+											var abc=JSON.stringify(msg);
+											console.log(abc);
+											abc=('"'+abc.substring(abc.indexOf('{')));//.replace('/\n', "");
+											//abc=('"'+abc.substring(abc.indexOf('{'))).replace('/\n', "");
+											console.log(typeof(abc));
+											console.log(abc);
+											console.log("message: "+JSON.parse(abc));
+											var jsonObjectvalue = new Object();
+											var tempvar = jQuery.parseJSON(abc);
+//											var temp1 = tempvar.substring(0,tempvar.length-1);
+											console.log(tempvar);
+											console.log(typeof tempvar);
+											jsonObjectvalue = JSON.parse(tempvar);
+											console.log(jsonObjectvalue);
+											console.log(typeof jsonObjectvalue)
+											console.log(jsonObjectvalue.code);
+											 $('#tablechart').html("Error:  "+jsonObjectvalue.message);
+											
+											
+										}
+										
+//										if(typeof outputvalue == 'object'){
+//											console.log("message type"+typeof outputvalue);
+//										}
+//										else{
+//											if(outputvalue === false){
+//											console.log(typeof outputvalue);
+//											console.log(msg);
+//											}
+//										}
+										
+						      
+						      		  });
+							}else{
+								alert("The field start with ga:")
+							}
+						
+						
+						//end ajax
 					}
 					
 					
