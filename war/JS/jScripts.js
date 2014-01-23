@@ -23,6 +23,7 @@
 	var filter;
 	var segment;
 	var sort;
+	var maxResults;
       
    // load the Google Visualization api for chart  
   google.load("visualization", "1", {packages:["corechart","table"]}); 
@@ -216,6 +217,7 @@ Start Ajax for GetAccount Info on PageLoad  */
 					sort = $('#sort').val();
 					startDate = $('#startdate').val();
 					endDate = $('#enddate').val();
+					maxResults = $('#maxResults').val();
 					console.log(metrics.lastIndexOf(','));
 					console.log(metrics.length-1);
 					if(metrics.lastIndexOf(',')==metrics.length-1){
@@ -235,6 +237,7 @@ Start Ajax for GetAccount Info on PageLoad  */
 					queryString.filter = filter;
 					queryString.segment = segment;
 					queryString.sort = sort;
+					queryString.maxResults = maxResults;
 						
 					//	'{"tableid":"'+tbl_id + '","metrics":"' + metrics + '","dimension":"' + dimension + '","startDate":"' + startDate + '","endDate":"' + endDate
 					//+ '","filter":"'+filter+'","segment":"'+segment+'","sort":"'+sort+'"}' ;
@@ -473,8 +476,7 @@ function csvDownload(data,ReportTitle){
         			hAxis: {title: 'Dimension', titleTextStyle: {color: 'red'}}
      				 };
 
-      		var chart = new google.visualization.AreaChart(document.getElementById('chartdraw'));
-      		chart.draw(data, options);
+      		
       		var tablechart = new google.visualization.Table(document.getElementById('tablechart'));
       		tablechart.draw(data, null);
 //      		console.log(data);

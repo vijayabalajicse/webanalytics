@@ -59,11 +59,11 @@
     <br/>
       <div class="form-group">
       <label class="control-label">Dimension &nbsp&nbsp </label>
-    <input type="text" placeholder="Select the Dimesion Name" id='dimension_val' required>     
+    <input type="text" placeholder="Ex. ga:visitCount" id='dimension_val' required>     
     </div><br/>
     <div class="form-group">
      <label class="control-label">Metrics &nbsp&nbsp </label>
-    <input type="text" placeholder="Select the Dimesion Name" id='metric_value' required>      
+    <input type="text" placeholder="Ex. ga:visits" id='metric_value' required>      
     </div>
     <br/>
     <div class="form-group">
@@ -92,6 +92,12 @@
     <input type="text"  class="datepicker" id="enddate" placeholder="Click & Select End Date" required>
     </div>
     <br/>
+    <div class="form-group">
+      <label class="control-label" >MaxResults </label>
+    <input type="text" id="maxResults" value=100 required>
+    </div>
+    <br/>
+    
     
      <div class="form-group">
        <button type="button" class="btn btn-info"  id='getdata'>Get Data</button>
@@ -103,8 +109,7 @@
 <div id="tablechart" style="width:100%;height:500px;">
 </div>
 
-<div id="chartdraw" style="width:800px;height:500px;">
-</div>
+
 
 
 </body>

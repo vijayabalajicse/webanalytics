@@ -384,10 +384,11 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp){
 		String segment = (String) jsonObj.get("segment");
 		String filter = (String) jsonObj.get("filter");
 		String sort = (String) jsonObj.get("sort");
-		System.out.println(table_id + " " + metrics + " " + dimension.length() + " " + startDate + " " + endDate+" "+filter.length()+" "+ segment.length()+" "+sort.length());
+		String maxResult =  (String) jsonObj.get("maxResults");
+		System.out.println(table_id + " " + metrics + " " + dimension.length() + " " + startDate + " " + endDate+" "+filter.length()+" "+ segment.length()+" "+sort.length()+""+maxResult);
 		
 		try {			
-			data_result = getResultsData(table_id,metrics,dimension,startDate,endDate,filter,segment,sort,analytics);
+			data_result = getResultsData(table_id,metrics,dimension,startDate,endDate,filter,segment,sort,maxResult,analytics);
 			System.out.println(data_result);
 			jsonObj = (JSONObject) parser.parse(data_result);
 			objJson =  (JSONObject) jsonObj.get("dataTable");
@@ -415,15 +416,17 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp){
 	 * @param filter
 	 * @param segment
 	 * @param sort
+	 * @param maxResult 
 	 * @param analytics
 	 * @return
 	 */
 	//Getting the GaData from Anlaytics
-	private String getResultsData(String table_id, String metrics,String dimension, String startDate, String endDate,String filter, String segment, String sort, Analytics analytics) 
+	private String getResultsData(String table_id, String metrics,String dimension, String startDate, String endDate,String filter, String segment, String sort, String maxResult, Analytics analytics) 
 	{
 	
 		log.info("Get the result for analytics");
 		String value = null;
+		int maxResults = Integer.parseInt(maxResult);
 		Get apiQuery;
 		try {
 		//value = analytics.data().ga().get(table_id, startDate, endDate, metrics).setDimensions(dimension).setSegment(segment).setFilters(filter).setSort(sort).setOutput("dataTable").setMaxResults(50).execute().toPrettyString();
@@ -440,7 +443,12 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp){
 			if(sort.length()!=0){
 				apiQuery.setSort(sort);
 			}
-			value = apiQuery.setOutput("dataTable").setMaxResults(50).execute().toPrettyString();
+			if(maxResults < 1000){
+				apiQuery.setMaxResults(maxResults);
+			}else{
+				apiQuery.setMaxResults(100);
+			}
+			value = apiQuery.setOutput("dataTable").execute().toPrettyString();
 			return value;
 		} catch (Exception e) {	
 			System.out.println(e);
