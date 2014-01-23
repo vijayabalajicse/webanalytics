@@ -59,8 +59,15 @@ public class WebAnalyticsServlet  {
 	Date printTime = new Date();
 	static GoogleClientSecrets clientSecrets = clientSecrets();
 	
+	/**
+	 *  /CallBack url for OAuth
+	 *   @param req
+	 *   @param resp	
+	 *   retrun redirect /home   page url
+	 */
+	
 	@RequestMapping(value="/oauth2callback")
-	public String callback(HttpServletRequest req, HttpServletResponse resp,ModelMap model){
+	public String callback(HttpServletRequest req, HttpServletResponse resp){
 		
 		Credential credential;
 		String code = req.getParameter("code");
@@ -90,7 +97,7 @@ public class WebAnalyticsServlet  {
 					resp.sendRedirect("/index.html");
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
-					log.info("login page");
+					log.info("login page error");
 				}
 			}
 			
@@ -106,11 +113,16 @@ public class WebAnalyticsServlet  {
 
 	
 
-	
+	/**
+	 * Home Page Url
+	 * @param req
+	 * @param resp	 
+	 * @return  Home Page
+	 */
 
 //Redirection Home Page
 @RequestMapping("/home")
-public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,ModelMap model){
+public String homeRedirect(HttpServletRequest req,HttpServletResponse resp){
 		HttpSession session =  req.getSession(false);
 		String urlLocation = null;
 		if(session == null){
@@ -130,7 +142,12 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 	
 	return urlLocation;
 }
-
+/**
+ * Using Authorization code getting accesstoken, Using Token creating Credential
+ * 
+ * @param Authorizationcode
+ * @return Credential or null
+ */
      //Send the Authroziation code and getting the accesstoken, creating Credential Object
 	private Credential getCredential(String code) {
 		GoogleTokenResponse tokenResponse;
@@ -144,6 +161,10 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 		return null;
 	}
 
+	/**
+	 * Calling LoginIn Url for OAuth
+	 * @param response
+	 */
 	//Login URL
 	@RequestMapping("/googleLogin")
 	public void googleLoginUrl(HttpServletResponse response){
@@ -154,6 +175,13 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 		}
 		
 	}
+	
+	/**
+	 * Getting the WebPropeties Using Account ID from GoogleAnalytics
+	 * @param ajaxdata
+	 * @param req
+	 * @return  List of WebProperties ID
+	 */
 	//Handle Ajax url request for get the Property info
 	@RequestMapping("/getPropertyInfo")
 	public @ResponseBody String getPropertyInfo(@RequestBody String ajaxdata,HttpServletRequest req){
@@ -189,12 +217,24 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 		 return properties;
 	}
 	
+	/**
+	 * Send the Email to user with Attachment
+	 * @param emailData
+	 * @param req
+	 * @return success message to client
+	 */
 	//Handle Email url Request
 	@RequestMapping("/emailRequest")
 	public @ResponseBody String emailTask(@RequestBody String emailData, HttpServletRequest req){
 		String getDataTable;
 		System.out.println("EmailData: "+emailData);
-		String emailid = (String) req.getSession().getAttribute("SESSION_USEREMAILID");
+		try {
+			jsonObj = (JSONObject) parser.parse(emailData);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			System.out.println(e.getMessage());
+		}
+		String emailid = (String) jsonObj.get("emailId");
 		System.out.println(emailid);
 		getDataTable = getGaData(emailData,req);
 		Queue taskQueue = QueueFactory.getQueue("EmailQueue");
@@ -202,7 +242,12 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 		return "success";
 	}
 	
-	
+	/**
+	 * Getting ProfileView Id Using WebProperties Id
+	 * @param propData
+	 * @param req
+	 * @return list of ProfileId
+	 */
 	//Handle Ajax url request for get the Profile info
 	@RequestMapping("/getProfileInfo")
 	public @ResponseBody String getProfileInfo(@RequestBody String propData,HttpServletRequest req){
@@ -245,7 +290,13 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 		
 		return profileInfo;
 	}
-
+  
+	/**
+	 * Logout the application 
+	 * @param req
+	 * @param resp
+	 * @return logout page
+	 */
 	//User logout
 	@RequestMapping("/logout")
 	public String logout(HttpServletRequest req, HttpServletResponse resp){
@@ -254,7 +305,11 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 		return "logout";
 	}
 	
-	
+	/**
+	 * Getting List of Account Id using Analytics Object
+	 * @param req
+	 * @return List of Accounts
+	 */
 	//Handle Ajax url request for get the account info
 	@RequestMapping("/getAccountInfo")
 	public @ResponseBody String getAccountInfo(HttpServletRequest req){
@@ -267,7 +322,11 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 	}
 	
 	
-
+   /**
+    * Getting Analytics Object using Accesstoken
+    * @param accesstoken
+    * @return Analytics Object for Coressponding user
+    */
 	
 	//Creating the Analytics Object 
     private Analytics getAnalayticsObject(String accesstoken){
@@ -279,15 +338,26 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
     	return analytics;
     	
     }
-
+   /**
+    * Get the GaData QueryString
+    * @param data
+    * @param req
+    * @return response String
+    */
 	@RequestMapping("/getdataAjax")
-	public @ResponseBody String getData(@RequestBody String data,HttpServletRequest req) {		
+	public @ResponseBody String getData(@RequestBody String QueryData,HttpServletRequest req) {		
 		String responseData;		
-		responseData = getGaData(data,req);
+		responseData = getGaData(QueryData,req);
 		return responseData;		
 		
 	}
 	
+	/**
+	 * Parsing the QueryData and Calling the G Data Result
+	 * @param QueryData
+	 * @param req
+	 * @return G Data Results
+	 */
 	//Sending data with queryInformation and analytics obj
 	private String getGaData(String QueryData,HttpServletRequest req){
 		JSONObject objJson= new JSONObject();
@@ -335,7 +405,19 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 		
 		
 	}
-	
+	/**
+	 * Getting the G Data from Analytics
+	 * @param table_id
+	 * @param metrics
+	 * @param dimension
+	 * @param startDate
+	 * @param endDate
+	 * @param filter
+	 * @param segment
+	 * @param sort
+	 * @param analytics
+	 * @return
+	 */
 	//Getting the GaData from Anlaytics
 	private String getResultsData(String table_id, String metrics,String dimension, String startDate, String endDate,String filter, String segment, String sort, Analytics analytics) 
 	{
@@ -367,6 +449,10 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 	
 	}
 	
+	/**
+	 * Getting Application Information from client_Secrets.json file
+	 * @return ClientSecrets Information
+	 */
 	//Getting Client Secrects form  json file
 	static private GoogleClientSecrets clientSecrets(){
 		try{
@@ -377,7 +463,10 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 		return null;
 		
 	}
-	
+	/**  
+	 * Building the Login Url for OAuth
+	 * @return
+	 */
 	//Building Login Url
 	static private String getBuildinLoginUrl() {		
 		scopes.add(AnalyticsScopes.ANALYTICS_READONLY);
@@ -386,7 +475,11 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp,Model
 		return url.build();
 	}
 	
-	
+	/**
+	 * Getting the Analtics Account Inforamtion using Analytics Object
+	 * @param analytics
+	 * @return List of Account Details
+	 */
 	//Get the Account info from google anlytics 
 	private String getAccountInfo(Analytics analytics)  
 	{

@@ -30,27 +30,45 @@
    
   $(function()
 		    { 
-/** Email the data  */	  
 	  
+	  $('#emailId').hide();
+	  $('#sendEmail').hide(); 
+	  
+	  /** Sending the Email
+	   * Param QueryString (EmailId added)
+	   * retrun success message
+	   *  */		  
 	  //email start point
 	  $('#email').click(function(){
-		  console.log("Email ready to send");
-		  console.log(queryString);
-		  $.ajax({
-			  type: "POST",
-			  url: "/emailRequest",
-			  contentType: "application/json",
-			  dataType: "json",
-			  data: queryString
-			  	  
-		  })
-		  .done(function(msg){
-			  alert(msg);
-		  });
+		  $('#emailId').show();
+		  $('#sendEmail').show();
 		  
 	  });
 	  
-	  
+	  $('#sendEmail').click(function(){
+		  console.log("Email ready to send");
+		  console.log(queryString);
+		  if(queryString != null){
+			  queryString.emailId = $('#emailId').val();
+			  console.log(queryString);
+			  console.log(typeof queryString)
+			  $.ajax({
+				  type: "POST",
+				  url: "/emailRequest",
+				  contentType: "application/json",
+				  dataType: "json",
+				  data: JSON.stringify(queryString)
+				  	  
+			  })
+			  .done(function(msg){
+				  alert(msg);
+			  });
+		  }
+		  else{
+			  alert("Attachment Data is empty");
+		  }
+		  
+	  });
 	  
 	  
 	  //email end point
@@ -162,51 +180,7 @@ Start Ajax for GetAccount Info on PageLoad  */
 	  
 	            $( ".datepicker" ).datepicker({ dateFormat: 'yy-mm-dd',maxDate: '+0D' });
 	            
-//	            $("#metrics").focusout(function(){
-//	            	$('#metric_value').val('');
-//	            	metrics.length = 0;
-//	            	
-//	            	$("#metrics :selected").each(function(i,selected)
-//	  		    		  {
-//	  		     			 metrics[i] = $(selected).text();     
-//	  		               });
-//	  		      
-//	  						console.log(metrics); 
-//	  						if(metrics.length > 7)
-//    						{
-//    							alert("Max 7 Selection");
-//    						}
-//    						else
-//    						{
-//    							$('#metric_value').val(metrics);
-//    						}
-//	  						
-//	  		      
-//	  					
-//	            	
-//	            });
-	           
-//	            $("#dimension").focusout(function(){
-//	            	$('#dimension_val').val('');
-//	            	dimen_val = [];
-//	            	$("#dimension :selected").each(function(i,selected)
-//	    		    		{
-//	    		      			dimen_val[i] = $(selected).text();     
-//	    		            });
-//	    		      
-//	    						console.log(dimen_val); 
-//	    		      
-//	    						if(dimen_val.length > 5)
-//	    						{
-//	    							alert("Max 7 Selection");
-//	    						}
-//	    						else
-//	    						{
-//	    							$('#dimension_val').val(dimen_val);
-//	    						}
-//	            	
-//	            });
-	              
+
 				$('#getdata').click(function()
 				{  
 					tbl_id = $('#tabl').val();
@@ -227,7 +201,18 @@ Start Ajax for GetAccount Info on PageLoad  */
 						dimension = dimension.substring(0,dimension.length-1);
 						console.log(dimension);
 					}
-					queryString =  '{"tableid":"'+tbl_id + '","metrics":"' + metrics + '","dimension":"' + dimension + '","startDate":"' + startDate + '","endDate":"' + endDate + '","filter":"'+filter+'","segment":"'+segment+'","sort":"'+sort+'"}' ;
+					queryString = new Object();
+					queryString.tableid = tbl_id;
+					queryString.metrics = metrics;
+					queryString.dimension = dimension;
+					queryString.startDate = startDate;
+					queryString.endDate = endDate;
+					queryString.filter = filter;
+					queryString.segment = segment;
+					queryString.sort = sort;
+						
+					//	'{"tableid":"'+tbl_id + '","metrics":"' + metrics + '","dimension":"' + dimension + '","startDate":"' + startDate + '","endDate":"' + endDate
+					//+ '","filter":"'+filter+'","segment":"'+segment+'","sort":"'+sort+'"}' ;
 					console.log(queryString);
 					
 					
@@ -246,16 +231,18 @@ Start Ajax for GetAccount Info on PageLoad  */
 						    		  {
 						       			 type : 'POST',
 						        		 url : '/getdataAjax',
-						        		 
+						        		 dataType : 'json',
 						        		 contentType: "application/json",
-						       		     data : queryString
+						       		     data : JSON.stringify(queryString)
 						       		  
 						     		  })
 									.done(function (msg) 
 						    		  { 
-										console.log(msg);	
-										try{
-										var outputvalue = jQuery.parseJSON(msg);
+										console.log(msg);
+										
+										try{											
+										console.log(JSON.stringify(msg));
+										var outputvalue = msg;
 										console.log(outputvalue);
 										console.log(outputvalue.message);
 										console.log(outputvalue.cols.length);
@@ -315,29 +302,7 @@ Start Ajax for GetAccount Info on PageLoad  */
 										
 										
 						      			$('#output').html(msg);
-										}
-										catch(e){
-											console.log(msg);
-											var abc=JSON.stringify(msg);
-											console.log(abc);
-											abc=('"'+abc.substring(abc.indexOf('{')));//.replace('/\n', "");
-											//abc=('"'+abc.substring(abc.indexOf('{'))).replace('/\n', "");
-											console.log(typeof(abc));
-											console.log(abc);
-											console.log("message: "+JSON.parse(abc));
-											var jsonObjectvalue = new Object();
-											var tempvar = jQuery.parseJSON(abc);
-//											var temp1 = tempvar.substring(0,tempvar.length-1);
-											console.log(tempvar);
-											console.log(typeof tempvar);
-											jsonObjectvalue = JSON.parse(tempvar);
-											console.log(jsonObjectvalue);
-											console.log(typeof jsonObjectvalue)
-											console.log(jsonObjectvalue.code);
-											 $('#tablechart').html("Error:  "+jsonObjectvalue.message);
-											
-											
-										}
+										
 										
 //										if(typeof outputvalue == 'object'){
 //											console.log("message type"+typeof outputvalue);
@@ -349,8 +314,55 @@ Start Ajax for GetAccount Info on PageLoad  */
 //											}
 //										}
 										
-						      
-						      		  });
+										}
+										catch(e){
+							    			  var abc;
+							    			    console.log(typeof msg)
+							    			    abc=JSON.stringify(msg);
+												console.log(abc);
+												abc=('"'+abc.substring(abc.indexOf('{')));//.replace('/\n', "");
+												//abc=('"'+abc.substring(abc.indexOf('{'))).replace('/\n', "");
+												console.log(typeof(abc));
+												console.log(abc);
+												console.log("message: "+JSON.parse(abc));
+												var jsonObjectvalue = new Object();
+												var tempvar = jQuery.parseJSON(abc);
+//												var temp1 = tempvar.substring(0,tempvar.length-1);
+												console.log(tempvar);
+												console.log(typeof tempvar);
+												jsonObjectvalue = JSON.parse(tempvar);
+												console.log(jsonObjectvalue);
+												console.log(typeof jsonObjectvalue)
+												console.log(jsonObjectvalue.code);
+												 $('#tablechart').html("Error:  "+jsonObjectvalue.message);
+							    			  
+							    		  }
+						      		  })
+						      		  .fail(function (msg){
+						      			  var jsonmsg;
+						      			  console.log(msg);
+						      			  
+						      			  console.log(msg.responseText);
+						      			 if(msg.responseText.substring(0,3) == '400'){
+						      				console.log(typeof msg.responseText);
+							      			  jsonmsg=JSON.stringify(msg.responseText);
+							      			  console.log(jsonmsg);
+							      			  jsonmsg=('"'+jsonmsg.substring(jsonmsg.indexOf('{')));							      			
+							      			  console.log(jsonmsg + typeof jsonmsg);
+							      			  var tempmsg = JSON.parse(jsonmsg);
+							      			  console.log(tempmsg + typeof tempmsg);
+							      			  var errormsg = JSON.parse(tempmsg);
+							      			  console.log(errormsg);
+							      			  $('#tablechart').html("Error:  "+errormsg.message);
+						      			 }
+						      			 else{
+						      				$('#tablechart').html("Error:  "+msg.responseText);
+						      			 }
+						      			  
+						      			  
+								
+							});
+						    		  
 							}else{
 								alert("The field start with ga:")
 							}

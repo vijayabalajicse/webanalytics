@@ -5,12 +5,13 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>Web Analytics</title>
+  <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
 <link href="http://getbootstrap.com/2.3.2/assets/css/bootstrap.css" rel="stylesheet" type="text/css" />
 <link href="http://getbootstrap.com/2.3.2/assets/css/bootstrap-responsive.css" rel="stylesheet" type="text/css" />
-<script src="http://getbootstrap.com/2.3.2/assets/js/bootstrap.js"></script>
-<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
-  <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
-  <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+<script src="/JS/bootstrap.js"></script>
+<link rel="stylesheet" href="/css/jquery-ui.css">
+
+  <script src="/JS/jquery-ui.js"></script>
   <script type="text/javascript" src="https://www.google.com/jsapi"></script>
   <script type="text/javascript" src="/JS/jScripts.js"></script>
   <script type="text/javascript" src="/JS/util.js"></script>
@@ -67,28 +68,28 @@
     <br/>
     <div class="form-group">
       <label class="control-label" >Segment &nbsp&nbsp </label>
-    <input type="text" id="segment" required>
+    <input type="text" id="segment" placeholder="Ex. dynamic::ga:country=~Pakistan" required>
     </div>
     <br/>
     <div class="form-group">
       <label class="control-label" >Filter &nbsp&nbsp </label>
-    <input type="text" id="filter" required>
+    <input type="text" id="filter" placeholder="Ex. ga:city==Chennai" required>
     </div>
     <br/>
     <div class="form-group">
       <label class="control-label" >Sort &nbsp&nbsp </label>
-    <input type="text" id="sort" required>
+    <input type="text" id="sort" placeholder="Ex. ga:visits" required>
     </div>
     <br/>
     <br/>
     <div class="form-group">
       <label class="control-label" >StartDate &nbsp&nbsp </label>
-    <input type="text"  class="datepicker" id="startdate" required>
+    <input type="text"  class="datepicker" id="startdate" placeholder="Click & Select Start Date" required>
     </div>
     <br/>
     <div class="form-group">
       <label class="control-label" >EndDate &nbsp&nbsp </label>
-    <input type="text"  class="datepicker" id="enddate" required>
+    <input type="text"  class="datepicker" id="enddate" placeholder="Click & Select End Date" required>
     </div>
     <br/>
     
@@ -96,9 +97,9 @@
        <button type="button" class="btn btn-info"  id='getdata'>Get Data</button>
     </div>
     
-  </div>  
-  <input type = "button" value ="Email" id = "email" />
-  <input type='button' value='Download' id='download' />
+  </div>  <br/>
+  <input type = "button" value ="Email" id = "email" /><input type="email" id="emailId"><input type="button" value="Send" id="sendEmail"><br/>
+ <br/> <input type='button' value='Download' id='download' />
 <div id="tablechart" style="width:100%;height:500px;">
 </div>
 
