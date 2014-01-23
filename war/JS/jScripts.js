@@ -46,27 +46,41 @@
 	  });
 	  
 	  $('#sendEmail').click(function(){
-		  console.log("Email ready to send");
-		  console.log(queryString);
-		  if(queryString != null){
-			  queryString.emailId = $('#emailId').val();
+		  if (/^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,3})+$/.test($('#emailId').val()))
+		  {
+			  console.log("Email ready to send");
 			  console.log(queryString);
-			  console.log(typeof queryString)
-			  $.ajax({
-				  type: "POST",
-				  url: "/emailRequest",
-				  contentType: "application/json",
-				  dataType: "json",
-				  data: JSON.stringify(queryString)
-				  	  
-			  })
-			  .done(function(msg){
-				  alert(msg);
-			  });
+			  if(queryString != null){
+				  queryString.emailId = $('#emailId').val();
+				  console.log(queryString);
+				  console.log(typeof queryString)
+				  $.ajax({
+					  type: "POST",
+					  url: "/emailRequest",
+					  contentType: "application/json",
+					  dataType: "json",
+					  data: JSON.stringify(queryString)
+					  	  
+				  })
+				  .done(function(msg){
+					  console.log(msg.status);
+					  alert(msg.status);
+					  $('#emailId').hide();
+					  $('#sendEmail').hide();
+					  
+				  });
+			  }
+			  else{
+				  alert("Attachment Data is empty");
+			  }
 		  }
 		  else{
-			  alert("Attachment Data is empty");
-		  }
+		    alert("e-mail address not valid format");  
+		    }
+		  
+			  
+		  
+		  
 		  
 	  });
 	  
@@ -74,7 +88,7 @@
 	  //email end point
 	  
 	  
-/** Ajax for GetAccount Info on PageLoad
+/** Ajax for GetAccount Infomation on PageLoad
 Start Ajax for GetAccount Info on PageLoad  */
                 $.ajax({
                 	type:"GET",
@@ -107,9 +121,10 @@ Start Ajax for GetAccount Info on PageLoad  */
                          }
                          $('#accountName').append( account_opt);  
                  }); 
- /** End Ajax for GetAccount Info on PageLoad  
+ /** End Ajax for GetAccount Info on PageLoad   */
                 
- /** Get the Properties detail of coressponding Account
+ /** 
+  * Get the Properties detail of coressponding Account
  Start       */         
                 $('#accountName').change(function(){
                 	console.log("opertion property"+$('#accountName option:selected').val());
@@ -138,7 +153,10 @@ Start Ajax for GetAccount Info on PageLoad  */
                 });
                 
                 // account change end
-                
+    /**
+     * Getting the profile Infomation from Servlet
+     * Sending the WebProperties Information
+     */            
                 //properties change event
                 $('#propName').change(function(){
                 	console.log("opertion property"+$('#accountName option:selected').val());
@@ -173,6 +191,9 @@ Start Ajax for GetAccount Info on PageLoad  */
                 
                 //end properties changes
                 
+       /**
+        * Getting the ProfileId Information
+        */         
                 //start to get profile Id
                 $('#profName').change(function(){
                 	$('#tabl').val("ga:"+$('#profName option:selected').val());
@@ -180,7 +201,11 @@ Start Ajax for GetAccount Info on PageLoad  */
 	  
 	            $( ".datepicker" ).datepicker({ dateFormat: 'yy-mm-dd',maxDate: '+0D' });
 	            
-
+        /**
+         * Get the G Data from Servelt
+         * Complusary Param tableid,metrics,startdate,enddate
+         * retrun the GData Result
+         */
 				$('#getdata').click(function()
 				{  
 					tbl_id = $('#tabl').val();
@@ -240,7 +265,7 @@ Start Ajax for GetAccount Info on PageLoad  */
 						    		  { 
 										console.log(msg);
 										
-										try{											
+//										try{											
 										console.log(JSON.stringify(msg));
 										var outputvalue = msg;
 										console.log(outputvalue);
@@ -314,29 +339,29 @@ Start Ajax for GetAccount Info on PageLoad  */
 //											}
 //										}
 										
-										}
-										catch(e){
-							    			  var abc;
-							    			    console.log(typeof msg)
-							    			    abc=JSON.stringify(msg);
-												console.log(abc);
-												abc=('"'+abc.substring(abc.indexOf('{')));//.replace('/\n', "");
-												//abc=('"'+abc.substring(abc.indexOf('{'))).replace('/\n', "");
-												console.log(typeof(abc));
-												console.log(abc);
-												console.log("message: "+JSON.parse(abc));
-												var jsonObjectvalue = new Object();
-												var tempvar = jQuery.parseJSON(abc);
+//										}
+//										catch(e){
+//							    			  var abc;
+//							    			    console.log(typeof msg)
+//							    			    abc=JSON.stringify(msg);
+//												console.log(abc);
+//												abc=('"'+abc.substring(abc.indexOf('{')));//.replace('/\n', "");
+//												//abc=('"'+abc.substring(abc.indexOf('{'))).replace('/\n', "");
+//												console.log(typeof(abc));
+//												console.log(abc);
+//												console.log("message: "+JSON.parse(abc));
+//												var jsonObjectvalue = new Object();
+//												var tempvar = jQuery.parseJSON(abc);
 //												var temp1 = tempvar.substring(0,tempvar.length-1);
-												console.log(tempvar);
-												console.log(typeof tempvar);
-												jsonObjectvalue = JSON.parse(tempvar);
-												console.log(jsonObjectvalue);
-												console.log(typeof jsonObjectvalue)
-												console.log(jsonObjectvalue.code);
-												 $('#tablechart').html("Error:  "+jsonObjectvalue.message);
-							    			  
-							    		  }
+//												console.log(tempvar);
+//												console.log(typeof tempvar);
+//												jsonObjectvalue = JSON.parse(tempvar);
+//												console.log(jsonObjectvalue);
+//												console.log(typeof jsonObjectvalue)
+//												console.log(jsonObjectvalue.code);
+//												 $('#tablechart').html("Error:  "+jsonObjectvalue.message);
+//							    			  
+//							    		  }
 						      		  })
 						      		  .fail(function (msg){
 						      			  var jsonmsg;
@@ -375,7 +400,10 @@ Start Ajax for GetAccount Info on PageLoad  */
 		      
 				});
 				
-				
+	/**
+	 * Downaload the CSV File Data
+	 * Using JsonInformation from Servlet
+	 */			
 					$('#download').click(function(){
 						var data = chartData;
 						if (data == '') {
@@ -390,7 +418,9 @@ Start Ajax for GetAccount Info on PageLoad  */
 		      
    //function start for csv download
    
-   
+   /**
+    * Creating the CSV File And Download Option
+    */
 function csvDownload(data,ReportTitle){
 
 	var jsonData = typeof data != 'object' ? JSON.parse(data) : data ;
@@ -420,6 +450,10 @@ function csvDownload(data,ReportTitle){
 	document.body.removeChild(link);
 }
    
+/**
+ * Displaying the Table CharDAta and Area Chat
+ * @param chartData
+ */
   //function end for csv
   function display(chartData)
   {

@@ -239,7 +239,7 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp){
 		getDataTable = getGaData(emailData,req);
 		Queue taskQueue = QueueFactory.getQueue("EmailQueue");
 		taskQueue.add(TaskOptions.Builder.withUrl("/sendemail").param("emailId", emailid).param("csvData", getDataTable));
-		return "success";
+		return "{\"status\":\"Success\"}";
 	}
 	
 	/**
