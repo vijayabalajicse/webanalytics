@@ -56,8 +56,11 @@ public class WebAnalyticsServlet  {
     JSONObject jsonObj = new JSONObject();
 	JSONParser parser = new JSONParser();    
 	Logger log = Logger.getLogger("LogInfo");	
-	Date printTime = new Date();
+	static Date printTime = new Date();
 	static GoogleClientSecrets clientSecrets = clientSecrets();
+	static String clientId = clientSecrets.getWeb().getClientId();
+	static String clientSecret =clientSecrets.getWeb().getClientSecret();
+	static String redirectedurl=clientSecrets.getWeb().getRedirectUris().get(0);
 	
 	/**
 	 *  /CallBack url for OAuth
@@ -84,9 +87,9 @@ public class WebAnalyticsServlet  {
 				session=req.getSession(); 				
 				session.setAttribute("SESSION_USEREMAILID", emailid);
 				session.setAttribute("USER_ACCESSTOKEN", credential.getAccessToken());
-				session.setAttribute("USER_REFRESHTOKEN", credential.getRefreshToken());
-				session.setAttribute("EXPIRES_MILISECOND", credential.getExpirationTimeMilliseconds());
-				session.setAttribute("USER_AUTH_CODE", code);	
+			//	session.setAttribute("USER_REFRESHTOKEN", credential.getRefreshToken());
+			//	session.setAttribute("EXPIRES_MILISECOND", credential.getExpirationTimeMilliseconds());
+			//	session.setAttribute("USER_AUTH_CODE", code);	
 				System.out.println(printTime+"Refresh token: "+ credential.getRefreshToken());
 				location = "redirect:/home";				
 
@@ -125,19 +128,21 @@ public class WebAnalyticsServlet  {
 public String homeRedirect(HttpServletRequest req,HttpServletResponse resp){
 		HttpSession session =  req.getSession(false);
 		String urlLocation = null;
-		if(session == null){
-			try {
-				resp.sendRedirect("/index.html");
-			} catch (IOException e) {
-				System.out.println(printTime+"Problem in response redirection");
-			}
+		if(session != null){
+			System.out.println(printTime+"redircted home");
+			urlLocation = "home";
+			
 		}
 		else if(session.getAttribute("SESSION_USEREMAILID") == null || session.getAttribute("SESSION_USEREMAILID") == ""){
 			urlLocation = "logout";
 		
 		}
 		else{
-			urlLocation = "home";
+			try {
+				resp.sendRedirect("/index.html");
+			} catch (IOException e) {
+				System.out.println(printTime+"Problem in response redirection");
+			}
 		}
 	
 	return urlLocation;
@@ -153,7 +158,8 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp){
 		GoogleTokenResponse tokenResponse;
 		try {			
 			System.out.println(printTime+"Authorization code: "+code);
-			tokenResponse = new GoogleAuthorizationCodeTokenRequest(HTTP_TRANSPORT,JSON_FACTORY,clientSecrets.getWeb().getClientId(),clientSecrets.getWeb().getClientSecret(),code,clientSecrets.getWeb().getRedirectUris().get(0)).execute();
+			tokenResponse = new GoogleAuthorizationCodeTokenRequest(HTTP_TRANSPORT,JSON_FACTORY,clientId,clientSecret,code,redirectedurl).execute();
+			//tokenResponse = new GoogleAuthorizationCodeTokenRequest(HTTP_TRANSPORT,JSON_FACTORY,clientSecrets.getWeb().getClientId(),clientSecrets.getWeb().getClientSecret(),code,clientSecrets.getWeb().getRedirectUris().get(0)).execute();
 			return new GoogleCredential.Builder().setClientSecrets(clientSecrets).setJsonFactory(JSON_FACTORY).setTransport(HTTP_TRANSPORT).build().setAccessToken(tokenResponse.getAccessToken()).setRefreshToken(tokenResponse.getRefreshToken());
 		} catch (IOException e) {
 			System.out.println(printTime+"Problem in sending code or creating credential object");
@@ -169,6 +175,7 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp){
 	@RequestMapping(value="/googleLogin")
 	public void googleLoginUrl(HttpServletResponse response){
 		try {
+			System.out.println(printTime+"started login"); 
 			response.sendRedirect(getBuildinLoginUrl());
 		} catch (IOException e) {			
 			System.out.println(printTime+"Probelm in response redirection");
@@ -481,6 +488,7 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp){
 	//Getting Client Secrects form  json file
 	static private GoogleClientSecrets clientSecrets(){
 		try{
+			System.out.println(printTime+"clientSecrets");
 			return GoogleClientSecrets.load(JSON_FACTORY,new InputStreamReader(WebAnalyticsServlet.class.getResourceAsStream("client_secrets.json")));
 		}catch(Exception e){
 			System.out.println("Problem in getting Client Secrets");
@@ -496,8 +504,10 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp){
 	static private String getBuildinLoginUrl() {		
 		scopes.add(AnalyticsScopes.ANALYTICS_READONLY);
         scopes.add("https://www.googleapis.com/auth/userinfo.email");
-        url = new GoogleAuthorizationCodeRequestUrl(clientSecrets.getWeb().getClientId(),clientSecrets.getWeb().getRedirectUris().get(0),scopes).setAccessType("offline");
-		return url.build();
+        url = new GoogleAuthorizationCodeRequestUrl(clientId,redirectedurl,scopes).setAccessType("offline");
+ //       url = new GoogleAuthorizationCodeRequestUrl(clientSecrets.getWeb().getClientId(),clientSecrets.getWeb().getRedirectUris().get(0),scopes).setAccessType("offline");
+	     System.out.println(printTime+"buildlogin"); 
+        return url.build();
 	}
 	
 	/**
