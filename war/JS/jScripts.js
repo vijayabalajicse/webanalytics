@@ -331,40 +331,7 @@ Start Ajax for GetAccount Info on PageLoad  */
 										
 						      			$('#output').html(msg);
 										
-										
-//										if(typeof outputvalue == 'object'){
-//											console.log("message type"+typeof outputvalue);
-//										}
-//										else{
-//											if(outputvalue === false){
-//											console.log(typeof outputvalue);
-//											console.log(msg);
-//											}
-//										}
-										
-//										}
-//										catch(e){
-//							    			  var abc;
-//							    			    console.log(typeof msg)
-//							    			    abc=JSON.stringify(msg);
-//												console.log(abc);
-//												abc=('"'+abc.substring(abc.indexOf('{')));//.replace('/\n', "");
-//												//abc=('"'+abc.substring(abc.indexOf('{'))).replace('/\n', "");
-//												console.log(typeof(abc));
-//												console.log(abc);
-//												console.log("message: "+JSON.parse(abc));
-//												var jsonObjectvalue = new Object();
-//												var tempvar = jQuery.parseJSON(abc);
-//												var temp1 = tempvar.substring(0,tempvar.length-1);
-//												console.log(tempvar);
-//												console.log(typeof tempvar);
-//												jsonObjectvalue = JSON.parse(tempvar);
-//												console.log(jsonObjectvalue);
-//												console.log(typeof jsonObjectvalue)
-//												console.log(jsonObjectvalue.code);
-//												 $('#tablechart').html("Error:  "+jsonObjectvalue.message);
-//							    			  
-//							    		  }
+									
 						      		  })
 						      		  .fail(function (msg){
 						      			  var jsonmsg;
@@ -415,6 +382,33 @@ Start Ajax for GetAccount Info on PageLoad  */
 							console.log("no data");
 							csvDownload(data,"Report");
 						}
+					});
+	/**
+	 * Save this Inforamtion into profile
+	 * 
+	 */
+					$('#saveProfile').click(function(){
+						alert("hi"+queryString+"  "+typeof queryString);
+						
+							var profileData =  queryString;
+							profileData.queryDated = new Date().toDateString();
+							console.log("ProfileData"+profileData);
+							console.log("Date"+new Date().toDateString());							
+							
+							//ajax Request
+							$.ajax({
+								
+								type : 'POST',
+								url  :  '/profilesave',
+								dataType: 'json',
+								contentType : 'application/json',
+								data : JSON.stringify(profileData)
+							})
+							.done(function(msgobj){
+								console.log(msgobj);
+							});
+						
+						
 					});
 				
 		    }); 

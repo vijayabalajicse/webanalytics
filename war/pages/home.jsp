@@ -5,7 +5,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>Web Analytics</title>
-  <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+   <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
 <link href="http://getbootstrap.com/2.3.2/assets/css/bootstrap.css" rel="stylesheet" type="text/css" />
 <link href="http://getbootstrap.com/2.3.2/assets/css/bootstrap-responsive.css" rel="stylesheet" type="text/css" />
 <script src="/JS/bootstrap.js"></script>
@@ -31,9 +31,10 @@
 <body>
    <div id="Header">
    You are Authorized as 
-  <span onload= "_gaq.push(['_trackEvent', 'UserLoged', 'UserEmailid', this.value]);"> <%= session.getAttribute("SESSION_USEREMAILID") %> </span><a href="/logout">Logout</a>
+  <span id="emailInfo" onload= "_gaq.push(['_trackEvent', 'UserLoged', 'UserEmailid', this.value]);"> <%= session.getAttribute("SESSION_USEREMAILID") %> </span><a href="/logout">Logout</a>
    </div>
-  <div class="form-horizontal">
+   
+    <div class="form-horizontal">
     <div class="form-group">
       <label class="control-label">Account Name &nbsp &nbsp </label>
       
@@ -101,9 +102,14 @@
     
      <div class="form-group">
        <button type="button" class="btn btn-info"  id='getdata'>Get Data</button>
+    </div><br/>
+    <div class="form-group">
+       <button type="button" class="btn btn-info"  id='saveProfile'>Save Into Profile</button>
     </div>
     
-  </div>  <br/>
+  </div> 
+   
+  <br/>
   <input type = "button" value ="Email" id = "email" /><input type="email" id="emailId"><input type="button" value="Send" id="sendEmail"><br/>
  <br/> <input type='button' value='Download' id='download' />
 <div id="tablechart" style="width:100%;height:500px;">

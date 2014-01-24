@@ -121,7 +121,7 @@ public class WebAnalyticsServlet  {
 	 */
 
 //Redirection Home Page
-@RequestMapping("/home")
+@RequestMapping(value="/home")
 public String homeRedirect(HttpServletRequest req,HttpServletResponse resp){
 		HttpSession session =  req.getSession(false);
 		String urlLocation = null;
@@ -166,7 +166,7 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp){
 	 * @param response
 	 */
 	//Login URL
-	@RequestMapping("/googleLogin")
+	@RequestMapping(value="/googleLogin")
 	public void googleLoginUrl(HttpServletResponse response){
 		try {
 			response.sendRedirect(getBuildinLoginUrl());
@@ -183,7 +183,7 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp){
 	 * @return  List of WebProperties ID
 	 */
 	//Handle Ajax url request for get the Property info
-	@RequestMapping("/getPropertyInfo")
+	@RequestMapping(value="/getPropertyInfo")
 	public @ResponseBody String getPropertyInfo(@RequestBody String ajaxdata,HttpServletRequest req){
 		Webproperties webProperties;
 		Analytics analytics;
@@ -224,7 +224,7 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp){
 	 * @return success message to client
 	 */
 	//Handle Email url Request
-	@RequestMapping("/emailRequest")
+	@RequestMapping(value="/emailRequest")
 	public @ResponseBody String emailTask(@RequestBody String emailData, HttpServletRequest req){
 		String getDataTable;
 		System.out.println("EmailData: "+emailData);
@@ -249,7 +249,7 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp){
 	 * @return list of ProfileId
 	 */
 	//Handle Ajax url request for get the Profile info
-	@RequestMapping("/getProfileInfo")
+	@RequestMapping(value="/getProfileInfo")
 	public @ResponseBody String getProfileInfo(@RequestBody String propData,HttpServletRequest req){
 		Map<String,String> profileMap = new LinkedHashMap<String,String>();
 		String profileInfo ="";
@@ -298,7 +298,7 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp){
 	 * @return logout page
 	 */
 	//User logout
-	@RequestMapping("/logout")
+	@RequestMapping(value="/logout")
 	public String logout(HttpServletRequest req, HttpServletResponse resp){
 		HttpSession session = req.getSession(false);
 		session.invalidate();		
@@ -311,7 +311,7 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp){
 	 * @return List of Accounts
 	 */
 	//Handle Ajax url request for get the account info
-	@RequestMapping("/getAccountInfo")
+	@RequestMapping(value="/getAccountInfo")
 	public @ResponseBody String getAccountInfo(HttpServletRequest req){
 		log.info("return the acccountinfo");
 		String accessToken = (String) req.getSession().getAttribute("USER_ACCESSTOKEN");			
@@ -321,6 +321,23 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp){
 	 return accountInfo;	
 	}
 	
+	/**
+	 * Saving User Profile
+	 */
+	@RequestMapping(value="/profilesave")
+	public @ResponseBody String saveProfile(@RequestBody String profileData,HttpServletRequest req){
+		System.out.println(profileData);
+		try {
+			jsonObj = (JSONObject) parser.parse(profileData);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			System.err.println(e.getMessage());
+		}
+		
+		
+		return profileData;
+		
+	}
 	
    /**
     * Getting Analytics Object using Accesstoken
@@ -344,7 +361,7 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp){
     * @param req
     * @return response String
     */
-	@RequestMapping("/getdataAjax")
+	@RequestMapping(value="/getdataAjax")
 	public @ResponseBody String getData(@RequestBody String QueryData,HttpServletRequest req) {		
 		String responseData;		
 		responseData = getGaData(QueryData,req);
