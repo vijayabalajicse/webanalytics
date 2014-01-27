@@ -34,6 +34,7 @@
 	  
 	  $('#emailId').hide();
 	  $('#sendEmail').hide(); 
+	  $('#showQuery').hide();
 	  
 	  /** Sending the Email
 	   * Param QueryString (EmailId added)
@@ -60,6 +61,7 @@
 					  url: "/emailRequest",
 					  contentType: "application/json",
 					  dataType: "json",
+					  asyn
 					  data: JSON.stringify(queryString)
 					  	  
 				  })
@@ -266,23 +268,26 @@ Start Ajax for GetAccount Info on PageLoad  */
 						     		  })
 									.done(function (msg) 
 						    		  { 
-										console.log(msg);
+										//console.log(msg);
 										
 //										try{											
-										console.log(JSON.stringify(msg));
+										//console.log(JSON.stringify(msg));
 										var outputvalue = msg;
-										console.log(outputvalue);
-										console.log(outputvalue.message);
-										console.log(outputvalue.cols.length);
+										//console.log(outputvalue);
+										//console.log(outputvalue.message);
+										//console.log(outputvalue.cols.length);
 										columnName = [];
+										columnName[0] = "Index";
+										dataType[0] = 'number';
 										for(var i =0; i < outputvalue.cols.length; i++ )
 								         {
-								            dataType[i] = outputvalue.cols[i].type;							            
-								             columnName[i] = outputvalue.cols[i].id;
+								            dataType[i+1] = outputvalue.cols[i].type;							            
+								             columnName[i+1] = outputvalue.cols[i].id;
 								           
-								         }    
+								         }   
+										//console.log("column : "+ columnName);
 								         rowsValue = [];
-								         console.log("Row value: " + outputvalue.rows);
+								       //  console.log("Row value: " + outputvalue.rows);
 								         if(outputvalue.rows == "undefined"){
 								        	$('#tablechart').html("No record found for this report");
 								        	console.log("undefined");
@@ -292,39 +297,46 @@ Start Ajax for GetAccount Info on PageLoad  */
 								         }
 								         for(var i = 0; i < outputvalue.rows.length ; i++)
 								         {
-								           
-								            rowsValue[i] = new Array();
-								           for( var j=0; j < outputvalue.cols.length ; j++)
+								        	// console.log(i);
+								            rowsValue[i] = new Array();								            
+								            rowsValue[i][0]=i+1;
+								           for( var j=1; j <= outputvalue.cols.length ; j++)
 								           {
-								            
+								            //console.log(j);
 								             if(dataType[j] == 'string')
 								             {
-								             rowsValue[i][j] =outputvalue.rows[i].c[j].v;
+								             rowsValue[i][j] =outputvalue.rows[i].c[j-1].v;
+								          //   console.log(rowsValue[i][j]);
 								             }
 								             else if(dataType[j] == 'number')
 								             {
-								             rowsValue[i][j] = eval( outputvalue.rows[i].c[j].v );  
+								             rowsValue[i][j] = eval( outputvalue.rows[i].c[j-1].v );  
+								           //  console.log(rowsValue[i][j]);
 								             }  
 								           }
 								          
+								         //  console.log(rowsValue[i][j]);
 								           
 								        }
 								        
+								         
 										console.log("column count: "+ columnName.length);
 										console.log("Row count: " + rowsValue.length );
-										console.log("column : "+ columnName);
-										console.log("Row : " + rowsValue );
+									//	console.log("column : "+ columnName);
+									//	console.log("Row : " + rowsValue );
 										console.log("Row count: " + chartData.length );
 										chartData.length = 0 ;
-										console.log("chartdata count: " + chartData );
+									//	console.log("chartdata count: " + chartData );
 										chartData = [ columnName ];
 										for( var index in rowsValue ) 
 										{
 											chartData.push( rowsValue[index] );
 										}
 										console.log(rowsValue.length)
-										console.log(chartData);
+									//	console.log(chartData);
 								        console.log( chartData.length ); 
+								        $('#formvalues').hide();
+								        $('#showQuery').show();
 								        display(chartData);
 
 										
@@ -350,6 +362,9 @@ Start Ajax for GetAccount Info on PageLoad  */
 							      			  console.log(errormsg);
 							      			  $('#tablechart').html("Error:  "+errormsg.message);
 						      			 }
+						      			 else if(msg.responseText.substring(0,3) == '401'){
+						      				$('#tablechart').html("Your Credentials expired Please Login <a href='/googleLogin'>Click Here</a>");
+						      			 }
 						      			 else{
 						      				$('#tablechart').html("Error:  "+msg.responseText);
 						      			 }
@@ -367,8 +382,17 @@ Start Ajax for GetAccount Info on PageLoad  */
 					}
 					
 					
-		      
+					
 				});
+				
+   /**
+    * display the query
+    * 
+    */				
+	$('#showQuery').click(function(){
+		$('#formvalues').show();
+		$('#showQuery').hide();
+		});				
 				
 	/**
 	 * Downaload the CSV File Data

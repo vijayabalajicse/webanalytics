@@ -39,7 +39,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 
-public class EmailSendUser {
+public class SendingEmail {
 	
 	JSONObject jsonObject = new JSONObject();
 	JSONObject tempObject = new JSONObject();

@@ -1,12 +1,90 @@
 @CHARSET "ISO-8859-1";
 
-
+bodys{
+	overflow: auto;
+}
 #Header{
-	padding-top:20px;	
+	padding-top:20px;
+	padding-right:10px;	
 	text-align : right;
-	height:50px;
+	height:40px;
 	width:100%;
 	border :1px solid black;
 	color: red
 	
+}
+#formvalues{
+	width:40%;
+	hieght:60%;
+	padding-left:50px;
+	padding-top:20px;
+}
+#header{
+	width:104%;
+	height:10%;
+	background-color:#443252;
+	color:#445566;
+	margin :-8px 20px 0px -10px;
+	box-shadow:3px 3px 3px #5C5C5C;
+	border:0px;
+	
+	
+}
+#title{
+	float:left;
+	padding-left:10px;
+	color:#ffffff;
+	font-family:Arial;
+	
+}
+#loginurl{
+	margin-top:5%;
+	margin-left:43%;
+	width:200px;
+	height:50px;
+	background-color:#DF5050;	
+	border-radius:8px;
+	text-align:center;
+	padding-top:2%;
+	border:3px solid #ffffff;
+	box-shadow:2px 3px 3px #5C5C5C;
+	
+	
+}
+#logintag{
+	color:#ffffff;
+	text-decoration:none;
+	font-family:Arial;
+	font-size:18;
+}
+
+#emaildivi{
+	width:400px;	
+	float:right;
+}
+#showQuery{
+	width:120px;
+	height:45px;
+	background-color:#555555;
+	color:white;
+	text-align:center;
+	padding-top:10px;
+	cursor:pointer;
+}
+#email{
+	background:url("/css/images/Email.png") ;
+	width:32px;
+	height:32px;
+	border:0;
+}
+#download{
+	background:url("/css/images/download.png");
+	width:32px;
+	height:32px;
+	margin-top:10px;
+	border:0;
+}
+#tablechart{
+	width:100%;	
+	position: absolute
 }

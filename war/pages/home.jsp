@@ -6,8 +6,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>Web Analytics</title>
    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
-<link href="http://getbootstrap.com/2.3.2/assets/css/bootstrap.css" rel="stylesheet" type="text/css" />
-<link href="http://getbootstrap.com/2.3.2/assets/css/bootstrap-responsive.css" rel="stylesheet" type="text/css" />
+<link href="/css/bootstrap.css" rel="stylesheet" type="text/css" />
 <script src="/JS/bootstrap.js"></script>
 <link rel="stylesheet" href="/css/jquery-ui.css">
 
@@ -33,86 +32,101 @@
    You are Authorized as 
   <span id="emailInfo" onload= "_gaq.push(['_trackEvent', 'UserLoged', 'UserEmailid', this.value]);"> <%= session.getAttribute("SESSION_USEREMAILID") %> </span><a href="/logout">Logout</a>
    </div>
-   
-    <div class="form-horizontal">
-    <div class="form-group">
-      <label class="control-label">Account Name &nbsp &nbsp </label>
-      
-    <select class="form-control" id="accountName">
-   
-    </select>
-    </div><br/>
-     <div class="form-group">
-      <label class="control-label" >Webproperties Name &nbsp &nbsp </label>
-    <select class="form-control" id="propName"></select>
-    
-    </div>
-    <br/>
-    <div class="form-group">
-      <label class="control-label">Profile Name &nbsp &nbsp </label>
-    <select class="form-control" id="profName"></select>
-    </div>
-    <br/><br/>
-    <div class="form-group">
-      <label class="control-label" >Table Id &nbsp&nbsp </label>
-    <input type="text" placeholder="Select the Profile Name" id="tabl" required>
-    </div>
-    <br/>
-      <div class="form-group">
-      <label class="control-label">Dimension &nbsp&nbsp </label>
-    <input type="text" placeholder="Ex. ga:visitCount" id='dimension_val' required>     
-    </div><br/>
-    <div class="form-group">
-     <label class="control-label">Metrics &nbsp&nbsp </label>
-    <input type="text" placeholder="Ex. ga:visits" id='metric_value' required>      
-    </div>
-    <br/>
-    <div class="form-group">
-      <label class="control-label" >Segment &nbsp&nbsp </label>
-    <input type="text" id="segment" placeholder="Ex. dynamic::ga:country=~Pakistan" required>
-    </div>
-    <br/>
-    <div class="form-group">
-      <label class="control-label" >Filter &nbsp&nbsp </label>
-    <input type="text" id="filter" placeholder="Ex. ga:city==Chennai" required>
-    </div>
-    <br/>
-    <div class="form-group">
-      <label class="control-label" >Sort &nbsp&nbsp </label>
-    <input type="text" id="sort" placeholder="Ex. ga:visits" required>
-    </div>
-    <br/>
-    <br/>
-    <div class="form-group">
-      <label class="control-label" >StartDate &nbsp&nbsp </label>
-    <input type="text"  class="datepicker" id="startdate" placeholder="Click & Select Start Date" required>
-    </div>
-    <br/>
-    <div class="form-group">
-      <label class="control-label" >EndDate &nbsp&nbsp </label>
-    <input type="text"  class="datepicker" id="enddate" placeholder="Click & Select End Date" required>
-    </div>
-    <br/>
-    <div class="form-group">
-      <label class="control-label" >MaxResults </label>
-    <input type="text" id="maxResults" value=100 required>
-    </div>
-    <br/>
-    
-    
-     <div class="form-group">
-       <button type="button" class="btn btn-info"  id='getdata'>Get Data</button>
-    </div><br/>
-    <div class="form-group">
+   <div>
+   <div id="emaildivi"><div><input type = "button" value ="" id = "email" /><input type="email" id="emailId"><input type="button" value="Send" id="sendEmail">
+ <input type='button' value='' id='download' /></div></div>  
+   <div id="formvalues">
+  
+   <form class="form-horizontal" role="form">
+        <div class="form-group">
+          <label  class="col-sm-4 control-label">Account</label>
+          <div class="col-sm-6">
+            <select class="form-control" id="accountName"></select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label  class="col-sm-4 control-label">Webproperties</label>
+          <div class="col-sm-6">
+            <select class="form-control" id="propName"></select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label  class="col-sm-4 control-label">Profile</label>
+          <div class="col-sm-6">
+            <select class="form-control" id="profName"></select>
+          </div>
+        </div>
+         <div class="form-group">
+          <label  class="col-sm-4 control-label">Table Id</label>
+          <div class="col-sm-6">
+            <input type="text" class="form-control" placeholder="Select the Profile Name" id="tabl" required>
+          </div>
+        </div>
+         <div class="form-group">
+          <label  class="col-sm-4 control-label">Dimension</label>
+          <div class="col-sm-6">
+            <input type="text" class="form-control" placeholder="Ex. ga:visitCount" id='dimension_val' required>  
+          </div>
+        </div>
+         <div class="form-group">
+          <label  class="col-sm-4 control-label">Metrics</label>
+          <div class="col-sm-6">
+            <input type="text" class="form-control"  placeholder="Ex. ga:visits" id='metric_value' required> 
+          </div>
+        </div>
+         <div class="form-group">
+          <label  class="col-sm-4 control-label">Segment</label>
+          <div class="col-sm-6">
+            <input type="text" class="form-control" id="segment" placeholder="Ex. dynamic::ga:country=~Pakistan" >
+          </div>
+        </div>
+         <div class="form-group">
+          <label  class="col-sm-4 control-label">Filter</label>
+          <div class="col-sm-6">
+            <input type="text" class="form-control" id="filter" placeholder="Ex. ga:city==Chennai" >
+          </div>
+        </div>
+         <div class="form-group">
+          <label  class="col-sm-4 control-label">Sort</label>
+          <div class="col-sm-6">
+            <input type="text" class="form-control" id="sort" placeholder="Ex. ga:visits" >
+          </div>
+        </div>
+         <div class="form-group">
+          <label  class="col-sm-4 control-label">Start Date</label>
+          <div class="col-sm-6">
+            <input type="text" class="form-control datepicker" id="startdate" placeholder="Click & Select Start Date" required>
+          </div>
+        </div>
+         <div class="form-group">
+          <label  class="col-sm-4 control-label">End Date</label>
+          <div class="col-sm-6">
+            <input type="text" class="form-control datepicker" id="enddate" placeholder="Click & Select End Date" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label  class="col-sm-4 control-label">MaxResults</label>
+          <div class="col-sm-6">
+            <input type="text" class="form-control" id="maxResults" value=100>
+          </div>
+        </div>    
+        <div class="form-group">
+          <div class="col-sm-offset-7 col-sm-10">
+            <button type="button" class="btn btn-info" id="getdata">Get Data</button>
+          </div>
+        </div>
+      </form>
+ </div>
+ </div>
+     <!-- <div class="form-group">
        <button type="button" class="btn btn-info"  id='saveProfile'>Save Into Profile</button>
-    </div>
-    
-  </div> 
+    </div> --> 
+  <div id="showQuery">ShowQuery</div>  
+ 
    
   <br/>
-  <input type = "button" value ="Email" id = "email" /><input type="email" id="emailId"><input type="button" value="Send" id="sendEmail"><br/>
- <br/> <input type='button' value='Download' id='download' />
-<div id="tablechart" style="width:100%;height:500px;">
+  
+<div id="tablechart" >
 </div>
 
 
