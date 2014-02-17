@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<queue-entries>
+    <total-storage-limit>5M</total-storage-limit>
+    <queue>        
+        <name>EmailQueue</name>        
+        <rate>10/s</rate>
+        <bucket-size>20</bucket-size>
+    </queue>
+</queue-entries>
