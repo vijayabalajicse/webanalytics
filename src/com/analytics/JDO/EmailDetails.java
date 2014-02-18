@@ -9,7 +9,8 @@ public class EmailDetails {
 	private String toAddress;
 	private Long frequent;
 	private Long subfreq;	
-	private long queryId;
+	private String queryId;
+	private String subject;
 	public String getFromAddress() {
 		return fromAddress;
 	}
@@ -29,10 +30,10 @@ public class EmailDetails {
 		this.frequent = frequent;
 	}
 	
-	public long getQueryId() {
+	public String getQueryId() {
 		return queryId;
 	}
-	public void setQueryId(long queryId) {
+	public void setQueryId(String queryId) {
 		this.queryId = queryId;
 	}
 	public Long getSubfreq() {
@@ -40,5 +41,11 @@ public class EmailDetails {
 	}
 	public void setSubfreq(Long subfreq) {
 		this.subfreq = subfreq;
+	}
+	public String getSubject() {
+		return subject;
+	}
+	public void setSubject(String subject) {
+		this.subject = subject;
 	}
 }

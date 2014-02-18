@@ -41,7 +41,7 @@
 	  $('#gaheader').hide();
 	  $('#weekdays').hide();
 	  $('#uploadid').hide();
-	  
+	  $('#getuserprofile').accordion();
 	  	/**
 		 * display userlist profile
 		 */			
@@ -768,7 +768,6 @@
 				  $('#customSave').click(function(){
 					  var temp= {};
 					  temp.toAddress = $('#emailid_share').val();
-					  temo.fromAddress = $('#fromEmail').val();
 					  temp.profile = JSON.parse(localStorage.getItem('userlist'))[index_p];
 					  $.ajax({
 						  

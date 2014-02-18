@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Transaction;
 import javax.servlet.http.HttpServletRequest;
@@ -288,7 +289,7 @@ public class AnalyticsController {
 		  UserProfile profile = pm.getObjectById(UserProfile.class, userId);
 		  LinkedHashMap<String, Map<String, String>> map = profile.getQuerydetails(); 
 		  Map<String, String> details = map.get(profileidindex);;
-		  details.put("customDimensions", dimension);
+		  details.put("customDimensions", dimension);   
 		  System.out.println(dimension);
 		  details.put("customMetrics", metrics);
 		  map.put(profileidindex, details);
@@ -297,6 +298,34 @@ public class AnalyticsController {
 		  pm.close();
 		   return "success";
 	   }
+	   
+	   @RequestMapping(value = "/shareprofile")
+	   public @ResponseBody String shareprofile(@RequestBody String requestData){
+		   PersistenceManager pm = PMFSingleton.getPMF().getPersistenceManager();
+		   String response = "{\"State\":\"Success\"}";
+		   try {
+			jsonObj = (JSONObject) parser.parse(requestData);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			log.warning(e.getMessage());
+		}
+		   String toAddress = (String) jsonObj.get("toAddress");
+		   JSONObject profile = (JSONObject) jsonObj.get("profile");
+		  // UserProfile user = (UserProfile) pm.getObjectById(UserProfile.class,toAddress);
+		   try{
+			   UserProfile user = (UserProfile) pm.getObjectById(UserProfile.class,toAddress);
+			   SendingEmail.sendEmail(profile.toJSONString(),toAddress,"profile.json","Profile Share");
+		   }
+		   catch(JDOObjectNotFoundException e){
+			   response = "Failure";
+		   }
+		   catch(Exception e){
+			   log.warning(e.getMessage());
+		   }
+		   return response;
+		   
+	   }
+	   
 		/**
 		 * Parsing the QueryData and Calling the G Data Result
 		 * @param QueryData

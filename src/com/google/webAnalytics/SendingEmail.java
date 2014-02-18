@@ -73,12 +73,13 @@ public class SendingEmail {
 	@ResponseBody
 	public void emailSending(HttpServletRequest req){
 		
-		String emailId, accesstoken,queryid;
+		String emailId, accesstoken,queryid,subject;
 		String csvData = null;	
 		
 		emailId= req.getParameter("emailId");
 		accesstoken = req.getParameter("accessToken");		
 		queryid = req.getParameter("queryid");
+		subject = req.getParameter("subject");
 		csvData = AnalyticsController.getGaData(queryid,accesstoken);
 		StringBuilder mailData = new StringBuilder();		
 		try {
@@ -108,23 +109,30 @@ public class SendingEmail {
 			mailData.append("\n");
 		}
 	//	System.out.println(mailData.toString());
-
+		sendEmail( mailData.toString(), emailId,"Report.csv",subject);
+		
+		
+		   
+	}
+	
+	public static void sendEmail(String data,String emailId,String filename,String subject){
 		Properties properties = new Properties();
 		 Multipart multipart = new MimeMultipart();
 	//	 MimeBodyPart htmlBodyPart = new MimeBodyPart();
 		 MimeBodyPart attachment = new MimeBodyPart();
 		 DataSource sourcedata;
 		Session session = Session.getDefaultInstance(properties);
-		byte[] attachmentData = mailData.toString().getBytes();
+		byte[] attachmentData = data.getBytes();
+		
 		Message message = new MimeMessage(session);
 		try {
-			message.setFrom(new InternetAddress("vijaya.balaji@a-cti.com","Vijayabalaji"));
+			message.setFrom(new InternetAddress("vijaya.balaji@a-cti.com","Admin"));
 			message.addRecipient(Message.RecipientType.TO, new InternetAddress(emailId,"Mr.User"));
-			message.setSubject("Analytics Account Gadata");
+			message.setSubject(subject);
 			message.setText("Google Analytics data in the Body");
 			//htmlBodyPart.setContent(message,"text/html"); 
 			//multipart.addBodyPart(htmlBodyPart);
-			attachment.setFileName("user.csv");
+			attachment.setFileName(filename);
 			sourcedata = new ByteArrayDataSource(attachmentData,"text/comma-separated-values");
 			attachment.setDataHandler(new DataHandler(sourcedata));
 			multipart.addBodyPart(attachment);
@@ -140,7 +148,6 @@ public class SendingEmail {
 			System.out.println("Problem in Mailing : "+ e.getStackTrace());
 		}
 		
-		   
 	}
 	
 

@@ -59,7 +59,7 @@ public class EmailController {
 	//Handle Email url Request
 	@RequestMapping(value="/emailRequest")
 	public @ResponseBody String emailTask(@RequestBody String emailData, HttpServletRequest req){
-		String emailid = null,querydata = null;
+		String emailid = null,querydata = null,subject = null;
 		String accessToken = (String) req.getSession().getAttribute("USER_ACCESSTOKEN");	
 		req.getSession().getAttribute("SESSION_USEREMAILID");
 		log.info("EmailData: "+emailData);
@@ -67,6 +67,7 @@ public class EmailController {
 			jsonObject = (JSONObject) jsonParser.parse(emailData);
 			emailid= (String) jsonObject.get("toAddress");
 			querydata = jsonObject.get("queryId").toString();
+			subject = (String) jsonObject.get("subject");
 			System.out.println("queryid getting:" + querydata);
 			
 		} catch (ParseException e) {
@@ -81,7 +82,7 @@ public class EmailController {
 //		cache = CacheInital.getcacheInstance();
 //		cache.put(emailid, getDataTable);
 		Queue taskQueue = QueueFactory.getQueue("EmailQueue");
-		taskQueue.add(TaskOptions.Builder.withUrl("/sendemail").param("emailId", emailid).param("queryid", querydata).param("accessToken", accessToken));
+		taskQueue.add(TaskOptions.Builder.withUrl("/sendemail").param("emailId", emailid).param("queryid", querydata).param("accessToken", accessToken).param("subject", subject));
 		return "{\"status\":\"Success\"}";
 	}
 	
@@ -99,7 +100,8 @@ public class EmailController {
 		String toAddress = (String)jsonObject.get("toAddress");
 		long frequent = (long)jsonObject.get("frequent");
 		long subfreq = (long)jsonObject.get("subfreq");
-		long queryid = (long) jsonObject.get("queryId");
+		String queryid = (String) jsonObject.get("queryId");
+		String subject = (String) jsonObject.get("subject");
 		jsonObject.get("subject");
 		
 		EmailDetails emailDetails = new EmailDetails();
@@ -108,6 +110,7 @@ public class EmailController {
 		emailDetails.setfrequent(frequent);
 		emailDetails.setSubfreq(subfreq);
 		emailDetails.setQueryId(queryid);
+		emailDetails.setSubject(subject);
 		
 		
 		try{
@@ -140,11 +143,11 @@ public class EmailController {
 		Query query = pm.newQuery(EmailDetails.class);
 		List<EmailDetails> mailDetails = (List<EmailDetails>) query.execute();
 		for(EmailDetails em : mailDetails){
-				System.out.println(em.getFromAddress()+" "+em.getToAddress()+" "+em.getfrequent()+ " "+em.getSubfreq()+" "+em.getQueryId());
+				System.out.println(em.getFromAddress()+" "+em.getToAddress()+" "+em.getfrequent()+ " "+em.getSubfreq()+" "+em.getQueryId()+" "+em.getSubject());
 		UserProfile profile = pm.getObjectById(UserProfile.class,em.getFromAddress());
 		LinkedHashMap<String, Map<String, String>> map = profile.getQuerydetails();
 		//System.out.println(profile.getQuerydetails().toString());		
-		Map<String, String> querydetails = map.get((int) em.getQueryId());
+		Map<String, String> querydetails = map.get(em.getQueryId());
 		//System.out.println(querydetails.toString());
 		//System.out.println(em.getfrequent().intValue());
 		String querydata = null;
@@ -165,7 +168,7 @@ public class EmailController {
 				log.warning(e.getMessage());
 			}
 			String accessToken = getGadatabyEmail(em);			
-			taskQueue.add(TaskOptions.Builder.withUrl("/sendemail").param("emailId", em.getToAddress()).param("queryid",querydata) .param("accessToken", accessToken));
+			taskQueue.add(TaskOptions.Builder.withUrl("/sendemail").param("emailId", em.getToAddress()).param("queryid",querydata) .param("accessToken", accessToken).param("subject", em.getSubject()));
 			calendar1 = null;
 		}
 		else if(em.getfrequent().intValue() == 2){
@@ -187,7 +190,7 @@ public class EmailController {
 				}
 				System.out.println("Weekly");
 				String accessToken = getGadatabyEmail(em);				
-				taskQueue.add(TaskOptions.Builder.withUrl("/sendemail").param("emailId", em.getToAddress()).param("queryid", querydata).param("accessToken", accessToken));
+				taskQueue.add(TaskOptions.Builder.withUrl("/sendemail").param("emailId", em.getToAddress()).param("queryid", querydata).param("accessToken", accessToken).param("subject", em.getSubject()));
 			}
 			
 		}
@@ -212,7 +215,7 @@ public class EmailController {
 				
 				System.out.println("Monthly");
 				String accessToken= getGadatabyEmail(em);				
-				taskQueue.add(TaskOptions.Builder.withUrl("/sendemail").param("emailId", em.getToAddress()).param("queryid", querydata).param("accessToken", accessToken));
+				taskQueue.add(TaskOptions.Builder.withUrl("/sendemail").param("emailId", em.getToAddress()).param("queryid", querydata).param("accessToken", accessToken).param("subject", em.getSubject()));
 			}
 		}
 		

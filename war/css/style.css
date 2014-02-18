@@ -13,6 +13,21 @@ bodys{
 	color: red
 	
 }
+.notifyjs-corner{
+	width:100%;
+	
+}
+.login{
+	width:200px;
+	height:50px;
+}
+#profilelists{
+	text-align:center;
+}
+.emailHead{
+	margin-top: -18px;
+margin-left: 5px
+}
 #formvalues{	
 	padding-left:50px;
 	padding-top:20px;
@@ -27,6 +42,10 @@ bodys{
 	border:0px;
 	
 	
+}
+.div-align{
+	padding-right: 0px;
+     padding-left: 0px;
 }
 #title{
 	float:left;
@@ -64,17 +83,19 @@ bodys{
 	
 	float:right;
 	border:1px solid #000000;
-	background-color:#eeeeee;
+	
 }
-#showQuery{	
+.head-grp{	
+	
+	/*margin-bottom: 20px;  margin-left: 10px;*/ 
+}
+.profilemerge{
+	border : 1px;
 	
 	
 }
-#lastresult{
-	cursor:pointer;
-	background-color:#ffffff;
-	border:1px solid #000000;
-	shadow-box:2px 2px 2px #000000;
+.cus{
+ margin-bottom: 5px;	
 }
 #email{
 	background:url("/css/images/Email.png") ;
@@ -85,8 +106,31 @@ bodys{
 #download{
 	background:url("/css/images/download.png");
 	width:32px;
-	height:32px;
-	margin-top:10px;
+	height:32px;	
+	border:0;
+}
+.apply{
+	background:url("/css/images/apply.png");
+	width:32px;
+	height:32px;	
+	border:0;
+}
+.delete{
+	background:url("/css/images/delete.png");
+	width:32px;
+	height:32px;	
+	border:0;
+}
+.export{
+	background:url("/css/images/export.png");
+	width:32px;
+	height:32px;	
+	border:0;
+}
+.share{
+	background:url("/css/images/share.png");
+	width:32px;
+	height:32px;	
 	border:0;
 }
 #tablechart{
