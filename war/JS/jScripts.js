@@ -35,6 +35,30 @@
 		    
 		  }
 		});
+	  $.notify.addStyle('foo', {
+		  html: 
+		    "<div>" +
+		      "<div class='clearfix'>" +
+		        "<div class='title' data-notify-html='title'/>" +
+		        "<div class='buttons'>" +
+		          "<button class='no'>Cancel</button>" +
+		          "<button class='yes' data-notify-text='button'></button>" +
+		        "</div>" +
+		      "</div>" +
+		    "</div>",
+		    classes: {
+			    base: {		      
+			      "background-color":"rgb(248, 252, 218)",
+			      "padding": "10px",
+			      "word-wrap": "break-word",
+			    	  "autoHide": "true",
+			    	  "clickToHide": "true",
+			    	  "autoHideDelay": "5000"
+			    }
+			    
+			  }  
+		});
+	  
 	  
 	  $('#emailId').hide();
 	  $('#sendEmail').hide(); 
@@ -47,7 +71,7 @@
 		 */			
 			$.ajax({
 				type:"POST",
-				url:'/getuserlist',
+				url:'/getuserlist',				
 				contentType:'application/json'
 			}).done(function(msg){
 				//console.log(msg);
@@ -59,8 +83,10 @@
 					
 				
 			}).fail(function(msg){console.log("error"+msg)});
-//		});	
-	  
+		
+	//  checking the share profile list
+			callshareprofile();
+			
 	  /** Sending the Email
 	   * Param QueryString (EmailId added)
 	   * retrun success message
@@ -191,6 +217,9 @@
 			}
 		}			
 			
+		
+		
+		
 			/**
 			 * Weekdays and MonthDays select
 			 */
@@ -578,6 +607,48 @@
 		$('#importprofile').click(function(){
 			$('#uploadid').toggle();
 		});
+		   
+		function callshareprofile(){
+			$.ajax({
+				type : "GET",
+				url : " /checkshareProfile",
+				dataType :'json',
+				contentType : "application/json"
+				
+			}).done(function(data){
+				console.log(data);
+				
+				for(var index in data){
+					console.log(data[index]);
+					var shareprofile = data[index].split('&');
+					console.log(data[index]);
+				//	$.notify(data[index].fromAddress +' '+  data[index].profile,'foo');
+					$.notify({
+						  title: ''+shareprofile[0]+' sharing the profile to you. You want to add ?',
+						  button: 'Add'
+						}, { 
+						  style: 'foo',
+						  autoHide: false,
+						  clickToHide: false
+						});
+				}
+				$('.no').click(function(){
+					 $(this).parent().parent().parent().remove(); 
+				  });
+				$('.yes').click(function(){
+					var i =$('.yes').index($(this));
+					var profile = data[i].split('&');
+					profileadd(JSON.parse(profile[2]));
+					 $(this).parent().parent().parent().remove(); 
+					 console.log($(this))
+				  });
+				
+			}).fail(function(msg){
+				
+			});
+			
+			}
+		    
 		    }); 
   
   
@@ -765,10 +836,11 @@
 				  $('<div class="form-group"><label class="col-sm-4 control-label">Enter the EmailId:</label><div class="col-sm-6"><input type="text" class="form-control" value="" id="emailid_share"></div></div> ').appendTo($('#custom-form'));
 				  $('<h4>Attached profile Name:  '+JSON.parse(localStorage.getItem('userlist'))[index_p].profileName+'</h4>').appendTo($('#custom-form'));
 				  $('#customSave').text("Send");
-				  $('#customSave').click(function(){
+				  $('#customSave').unbind('click');
+				  $('#customSave').bind( 'click',function(){
 					  var temp= {};
 					  temp.toAddress = $('#emailid_share').val();
-					  temo.fromAddress = $('#fromEmail').val();
+					  temp.fromAddress = $('#fromEmail').val();
 					  temp.profile = JSON.parse(localStorage.getItem('userlist'))[index_p];
 					  $.ajax({
 						  
@@ -899,7 +971,7 @@
 			   div.appendChild(table);
 			   $('#gatable').tablesorter();
 			   if(outputvalue.totalResults)
-			$('#totalcountrep').text("total no. of results "+outputvalue.rows.length +" / "+outputvalue.totalResults);
+			$('#totalcountrep').text("total no. of results "+outputvalue.rows.length +" / "+outputvalue.totalResults+ "Date Range");
 		}
    }
    

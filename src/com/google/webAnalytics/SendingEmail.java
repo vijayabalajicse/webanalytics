@@ -93,7 +93,7 @@ public class SendingEmail {
 		
 		//System.out.println(column.toJSONString());
 		
-		for(int k =0;k< column.size();k++ ){
+		for(int k =0;k< column.size()-1;k++ ){
           tempObject = (JSONObject) column.get(k);
           mailData.append(tempObject.get("name")+",");
 		}
@@ -102,7 +102,7 @@ public class SendingEmail {
 		for(int t= 0;t< row.size();t++){
 			//tempObject = (JSONObject) row.get(t);
 			rowvalue = (JSONArray) row.get(t);
-			for(int v=0;v<rowvalue.size();v++){
+			for(int v=0;v<rowvalue.size()-1;v++){
 				//tempObject = (JSONObject) rowvalue.get(v);
 				mailData.append((rowvalue.get(v).toString().indexOf(',') == -1 ? rowvalue.get(v).toString() : rowvalue.get(v).toString().replaceAll(","," "))+",");
 			}

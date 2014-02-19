@@ -1,13 +1,19 @@
 package com.google.webAnalytics;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 import javax.jdo.Transaction;
 import javax.servlet.http.HttpServletRequest;
 
@@ -22,12 +28,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.analytics.JDO.PMFSingleton;
+import com.analytics.JDO.ShareProfile;
+import com.analytics.JDO.UserDetails;
 import com.analytics.JDO.UserProfile;
 import com.analytics.util.CacheInital;
 import com.analytics.util.DataCompress;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import com.google.api.client.util.Base64;
 import com.google.api.services.analytics.Analytics;
 import com.google.api.services.analytics.Analytics.Data.Ga.Get;
 import com.google.api.services.analytics.model.Accounts;
@@ -35,6 +45,7 @@ import com.google.api.services.analytics.model.GaData;
 import com.google.api.services.analytics.model.Profiles;
 import com.google.api.services.analytics.model.Webproperties;
 import com.google.appengine.api.datastore.KeyFactory;
+
 
 
 @Controller
@@ -310,20 +321,98 @@ public class AnalyticsController {
 			log.warning(e.getMessage());
 		}
 		   String toAddress = (String) jsonObj.get("toAddress");
+		   String fromAddress = (String) jsonObj.get("fromAddress");
 		   JSONObject profile = (JSONObject) jsonObj.get("profile");
+		   String profilename = (String) profile.get("profileName");
+		   byte[] stringbyte = Base64.encodeBase64(profilename.getBytes());
+		   String value = toAddress+"&"+fromAddress+"&"+profile.toString();
 		  // UserProfile user = (UserProfile) pm.getObjectById(UserProfile.class,toAddress);
-		   try{
-			   UserProfile user = (UserProfile) pm.getObjectById(UserProfile.class,toAddress);
-			   SendingEmail.sendEmail(profile.toJSONString(),toAddress,"profile.json","Profile Share");
+		   System.out.println(value);
+		   ShareProfile share = new ShareProfile();
+		   share.setFromAddress(fromAddress);
+		   share.setToAddress(toAddress);
+		   share.setProfile(profile.toJSONString());
+		   try{			   
+//			   pm.makePersistent(share);
+//			   log.info("shared profile stored");
+			   cache = CacheInital.getcacheInstance();
+			   ArrayList list2 =(ArrayList) cache.get("emailnotification");
+			//   UserDetails user = (UserDetails) pm.getObjectById(UserDetails.class,toAddress);
+			   ArrayList list = new ArrayList();
+			   list.add(value);
+			   if(list2 != null)
+			   list.addAll(list2);
+			   cache.put("emailnotification", list);
+//			   String prevlist = getCachedata("emailnotification");
+//			   list.addAll(prevlist.)
+//			   list.addAll()
+//			   saveCache("emailnotification",value);
+			 //  SendingEmail.sendEmail(profile.toJSONString(),toAddress,"profile.json","Profile Share");
 		   }
 		   catch(JDOObjectNotFoundException e){
-			   response = "Failure";
+			   response = "Emailid not in the list";
 		   }
 		   catch(Exception e){
 			   log.warning(e.getMessage());
 		   }
+		   finally{
+			   pm.close();
+		   }
 		   return response;
 		   
+	   }
+	   
+	   @RequestMapping(value = "/checkshareProfile")
+	   public @ResponseBody String checkshareProfile(HttpServletRequest req){
+		   String user = (String) req.getSession().getAttribute("SESSION_USEREMAILID");
+		  // PersistenceManager pm = PMFSingleton.getPMF().getPersistenceManager();
+		   String response = "null ";
+		       try{
+		    	   cache = CacheInital.getcacheInstance();
+		    	   ArrayList list = (ArrayList) cache.get("emailnotification");
+		    	   ArrayList list1 = new ArrayList();
+		    	   ArrayList list2 = new ArrayList();
+		    	   Iterator it =list.iterator();
+		    	   while(it.hasNext()){
+		    		   String element =  it.next().toString();
+		    		   String toAddress = element.toString().split("&")[0];
+		    		   if(toAddress.equals(user)){
+		    			   list1.add(element);
+		    			   
+		    		   }
+		    		   else{
+		    			   list2.add(element);
+		    		   }
+		    		   
+		    	   }
+//		    	   List arrvalue = new ArrayList();
+//		    	   arrvalue.addAll(list);
+//		    	   System.out.println(list);
+//		    	   for(String index : arrvalue){
+//		    		   System.out.println(index);
+//		    	   }
+		    	   cache.put("emailnotification", list2);
+		    	   log.info("current list: "+list2.toString());
+		    	   response = jsonMap.writeValueAsString(list1);
+		    	   System.out.println(cache.get("emailnotification"));
+		    	   log.info("current list:" + cache.get("emailnotification"));
+		       }catch(Exception e){
+		    	   
+		    	   log.warning(e.getMessage());
+		       }
+			    
+			
+//			 //  List<ShareProfile> share = (List<ShareProfile>) query.execute(user);
+//			   String shareprofile = null ;
+//			   try {
+//				//   shareprofile = jsonMap.writeValueAsString(share);
+//			} catch (JsonProcessingException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			System.out.println(shareprofile);
+		   
+		   return response;
 	   }
 	   
 		/**

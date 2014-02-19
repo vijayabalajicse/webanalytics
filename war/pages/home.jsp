@@ -61,7 +61,8 @@
            <button type="button" id="showQuery">ShowQuery</button>&nbsp;&nbsp; 
            <select id="dimension_grp"></select> &nbsp;&nbsp; <select id="dimension_srh"></select>&nbsp;&nbsp; 
            <input type='text' id="dimen_val">&nbsp; <button type="button" id="srch_dimen">Search</button> &nbsp;&nbsp;<input type="checkbox" id="partialsearch" value="PartialSearch">Partial Search
-           <option value=50>50</option><option value=100>100</option></select> &nbsp; <button type="button" id="clear_tbl">Clear</button> &nbsp; 
+           <select id="noofresult"><option value="0">Select the No rows</option><option value="10">10</option><option value="20">20</option>
+           <option value="50">50</option><option value="100">100</option></select> &nbsp; <button type="button" id="clear_tbl">Clear</button> &nbsp; 
            <button type="button" id="custom" data-toggle="modal" data-target="#myModal1" >Customization</button></div> </div>
             <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> 
             <div class="modal-dialog"> <div class="modal-content"> <div class="modal-header"> 
