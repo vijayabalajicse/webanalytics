@@ -418,7 +418,7 @@
 												}											
 											displayTable(JSONDATA);
 											gdata = null;
-											dimensionadd(queryString.dimensions,document.getElementById('dimension_grp'),"Select Primary Dimension for group");
+											dimensionadd(queryString.dimensions,document.getElementById('dimension_grp'),"Select Dimension for group");
 											dimensionadd(queryString.dimensions,document.getElementById('dimension_srh'),"Select Dimension for Search");
 							      		  })
 							      		  .fail(function (msg){
@@ -624,7 +624,7 @@
 					console.log(data[index]);
 				//	$.notify(data[index].fromAddress +' '+  data[index].profile,'foo');
 					$.notify({
-						  title: ''+shareprofile[0]+' sharing the profile to you. You want to add ?',
+						  title: ''+shareprofile[1]+' sharing the profile to you. You want to add ?',
 						  button: 'Add'
 						}, { 
 						  style: 'foo',
@@ -971,7 +971,7 @@
 			   div.appendChild(table);
 			   $('#gatable').tablesorter();
 			   if(outputvalue.totalResults)
-			$('#totalcountrep').text("total no. of results "+outputvalue.rows.length +" / "+outputvalue.totalResults+ "Date Range");
+			$('#totalcountrep').text("total no. of results "+outputvalue.rows.length +" / "+outputvalue.totalResults+ "Date Range: StartDate: "+outputvalue.query['start-date']+" EndDate:  "+ outputvalue.query['end-date']);
 		}
    }
    

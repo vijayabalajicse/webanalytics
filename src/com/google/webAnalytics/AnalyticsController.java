@@ -385,32 +385,15 @@ public class AnalyticsController {
 		    		   }
 		    		   
 		    	   }
-//		    	   List arrvalue = new ArrayList();
-//		    	   arrvalue.addAll(list);
-//		    	   System.out.println(list);
-//		    	   for(String index : arrvalue){
-//		    		   System.out.println(index);
-//		    	   }
-		    	   cache.put("emailnotification", list2);
-		    	   log.info("current list: "+list2.toString());
+		    	   cache.put("emailnotification", list2);		    	   
 		    	   response = jsonMap.writeValueAsString(list1);
-		    	   System.out.println(cache.get("emailnotification"));
-		    	   log.info("current list:" + cache.get("emailnotification"));
+		    	  
 		       }catch(Exception e){
 		    	   
 		    	   log.warning(e.getMessage());
-		       }
-			    
+		       }   
 			
-//			 //  List<ShareProfile> share = (List<ShareProfile>) query.execute(user);
-//			   String shareprofile = null ;
-//			   try {
-//				//   shareprofile = jsonMap.writeValueAsString(share);
-//			} catch (JsonProcessingException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//			System.out.println(shareprofile);
+
 		   
 		   return response;
 	   }

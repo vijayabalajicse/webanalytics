@@ -85,7 +85,12 @@ public class EmailController {
 		taskQueue.add(TaskOptions.Builder.withUrl("/sendemail").param("emailId", emailid).param("queryid", querydata).param("accessToken", accessToken).param("subject", subject));
 		return "{\"status\":\"Success\"}";
 	}
-	
+	/**
+	 * Email Schedule for the report
+	 * @param data
+	 * @param req
+	 * @return
+	 */
 	@RequestMapping(value="/scheduleemail")	
 	public @ResponseBody String scheduleEmail(@RequestBody String data, HttpServletRequest req){
 		
@@ -131,7 +136,9 @@ public class EmailController {
 		
 	}
 	
-	
+	/**
+	 * Cron service for sending the schdule report
+	 */
 	@RequestMapping(value = "/cron_email")
 	public @ResponseBody void cronScheduleEmail(){
 		SimpleDateFormat dataformat = new SimpleDateFormat("yyyy-MM-dd");
@@ -222,7 +229,11 @@ public class EmailController {
 
 		}
 	}
-
+/**
+ * Getting Access token by UserEmailId
+ * @param em
+ * @return
+ */
 	private String getGadatabyEmail(EmailDetails em){
 		UserDetails user = pm.getObjectById(UserDetails.class,em.getFromAddress() );
 		String refreshtoken = user.getRefreshtoken();		
@@ -231,6 +242,11 @@ public class EmailController {
 		
 		return accesstoken;
 	}
+	/**Using the refreshtoken getting the accesstoken
+	 * 
+	 * @param refreshToken
+	 * @return
+	 */
 	private String getAccesstoken(String refreshToken) {
 		// TODO Auto-generated method stub
 		TokenResponse tokenrequest = null ;
