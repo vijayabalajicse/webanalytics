@@ -12,7 +12,11 @@ import org.mortbay.log.Log;
 
 public class DataCompress {
 
-	
+	/**
+	 * GZIP compression Method
+	 * @param data
+	 * @return
+	 */
 	public static String compression(String data){
 		ByteArrayOutputStream byteoutput = null;
 		GZIPOutputStream gzipout ;
@@ -32,6 +36,11 @@ public class DataCompress {
 		
 		return responsedata;
 	}
+	/**
+	 * Gzip decompression method
+	 * @param data
+	 * @return
+	 */
 	public static String deCompression(String data){		
 		GZIPInputStream gzipin;		
 		String outData ="";

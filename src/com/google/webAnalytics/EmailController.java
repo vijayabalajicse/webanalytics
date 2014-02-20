@@ -75,12 +75,7 @@ public class EmailController {
 			log.warning(e.getMessage());
 		}
 		 
-		//log.info(emailid);		
-		 
-//		getDataTable = DataCompress.compression(AnalyticsController.getGaData(querydata,accessToken));
-//		System.out.println(getDataTable.length());
-//		cache = CacheInital.getcacheInstance();
-//		cache.put(emailid, getDataTable);
+
 		Queue taskQueue = QueueFactory.getQueue("EmailQueue");
 		taskQueue.add(TaskOptions.Builder.withUrl("/sendemail").param("emailId", emailid).param("queryid", querydata).param("accessToken", accessToken).param("subject", subject));
 		return "{\"status\":\"Success\"}";
@@ -230,7 +225,7 @@ public class EmailController {
 		}
 	}
 /**
- * Getting Access token by UserEmailId
+ * Getting Refresh token by UserEmailId from datastore
  * @param em
  * @return
  */
@@ -242,7 +237,7 @@ public class EmailController {
 		
 		return accesstoken;
 	}
-	/**Using the refreshtoken getting the accesstoken
+	/**Method for getting the accesstoken by Refreshtoken
 	 * 
 	 * @param refreshToken
 	 * @return

@@ -69,6 +69,10 @@ public class SendingEmail {
 	
 	JSONArray column,row,rowvalue;
 	String CSV ="";
+	/**
+	 * Sending the email to user
+	 * @param req
+	 */
 	@RequestMapping(value="/sendemail")
 	@ResponseBody
 	public void emailSending(HttpServletRequest req){
@@ -114,7 +118,13 @@ public class SendingEmail {
 		
 		   
 	}
-	
+	/**
+	 * Method for sending email
+	 * @param data
+	 * @param emailId
+	 * @param filename
+	 * @param subject
+	 */
 	public static void sendEmail(String data,String emailId,String filename,String subject){
 		Properties properties = new Properties();
 		 Multipart multipart = new MimeMultipart();

@@ -191,7 +191,12 @@ public class AnalyticsController {
 			return responseData;		
 			
 		}
-		
+		/**
+		 * Storing the Custom profile in the Datastore
+		 * @param inputdata
+		 * @param req
+		 * @return
+		 */
 		@RequestMapping(value="/storeprofiledata")
 		public @ResponseBody String storeprofile(@RequestBody String inputdata,HttpServletRequest req){
 			System.out.println(inputdata);
@@ -227,7 +232,9 @@ public class AnalyticsController {
 		}
 		
 		/**
-		 * Get lastSearch result from cache
+		 * Get last Search results
+		 * @param req
+		 * @return
 		 */
 	   @RequestMapping(value="/getlastsearch")
 	   public @ResponseBody String getResult(HttpServletRequest req){
@@ -238,6 +245,11 @@ public class AnalyticsController {
 		return resultdata;
 		   
 	   }
+	   /**
+	    * Get userprofile list from datastore
+	    * @param req
+	    * @return
+	    */
 	   @RequestMapping(value="/getuserlist")
 	   public @ResponseBody String getuserlist(HttpServletRequest req){
 		   String userid = (String) req.getSession().getAttribute("SESSION_USEREMAILID");
@@ -255,7 +267,11 @@ public class AnalyticsController {
 		}
 		   return profiledetail;
 	   }
-	   
+	   /**
+	    * Delete the profile in the datastore
+	    * @param req
+	    * @return
+	    */
 	   @RequestMapping(value = "/deleteprofile")
 	   public @ResponseBody String deleteProfile(HttpServletRequest req){
 		   String index = req.getParameter("index");
@@ -280,7 +296,11 @@ public class AnalyticsController {
 	   
 	   
 	   
-	   
+	   /**
+	    * Adding the custom dimension to the profile
+	    * @param customdata
+	    * @return
+	    */
 	   @RequestMapping(value ="/addcustomdimension" )
 		public @ResponseBody String addcustomdimension(@RequestBody String customdata){
 		   PersistenceManager pm = PMFSingleton.getPMF().getPersistenceManager();
@@ -309,7 +329,11 @@ public class AnalyticsController {
 		  pm.close();
 		   return "success";
 	   }
-	   
+	   /**
+	    * Share the user profile to other users
+	    * @param requestData
+	    * @return
+	    */
 	   @RequestMapping(value = "/shareprofile")
 	   public @ResponseBody String shareprofile(@RequestBody String requestData){
 		   PersistenceManager pm = PMFSingleton.getPMF().getPersistenceManager();
@@ -333,21 +357,16 @@ public class AnalyticsController {
 		   share.setToAddress(toAddress);
 		   share.setProfile(profile.toJSONString());
 		   try{			   
-//			   pm.makePersistent(share);
-//			   log.info("shared profile stored");
+
 			   cache = CacheInital.getcacheInstance();
 			   ArrayList list2 =(ArrayList) cache.get("emailnotification");
-			//   UserDetails user = (UserDetails) pm.getObjectById(UserDetails.class,toAddress);
+			
 			   ArrayList list = new ArrayList();
 			   list.add(value);
 			   if(list2 != null)
 			   list.addAll(list2);
 			   cache.put("emailnotification", list);
-//			   String prevlist = getCachedata("emailnotification");
-//			   list.addAll(prevlist.)
-//			   list.addAll()
-//			   saveCache("emailnotification",value);
-			 //  SendingEmail.sendEmail(profile.toJSONString(),toAddress,"profile.json","Profile Share");
+
 		   }
 		   catch(JDOObjectNotFoundException e){
 			   response = "Emailid not in the list";
@@ -361,7 +380,11 @@ public class AnalyticsController {
 		   return response;
 		   
 	   }
-	   
+	   /**
+	    * Check the any profile shared or not
+	    * @param req
+	    * @return
+	    */
 	   @RequestMapping(value = "/checkshareProfile")
 	   public @ResponseBody String checkshareProfile(HttpServletRequest req){
 		   String user = (String) req.getSession().getAttribute("SESSION_USEREMAILID");
@@ -456,7 +479,11 @@ public class AnalyticsController {
 			
 			
 		}
-		
+		/**
+		 * Get datafrom MemCache
+		 * @param key
+		 * @return
+		 */
 	  private static String getCachedata(String key){
 		  cache = CacheInital.getcacheInstance();
 		  System.out.println(key);
@@ -480,7 +507,18 @@ public class AnalyticsController {
 			cache.put(userId, DataCompress.compression(data_result));
 			
 		}
-
+        /**
+         * Method for store the profile
+         * @param table_id
+         * @param metrics
+         * @param dimension
+         * @param startDate
+         * @param endDate
+         * @param userId
+         * @param filter
+         * @param profileName
+         * @param profileIndex
+         */
 		private static void storeProfileDetails(String table_id,String metrics, String dimension, String startDate,	String endDate, String userId,String filter,String profileName,String profileIndex) {
 			// TODO Auto-generated method stub
 			System.out.println(userId);

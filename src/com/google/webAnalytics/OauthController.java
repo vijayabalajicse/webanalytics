@@ -243,9 +243,9 @@ public String homeRedirect(HttpServletRequest req,HttpServletResponse resp){
 	}
 	
 	/**
-	 * 
-	 * @param attribute
-	 * @param attribute2
+	 * Method for store the refresh token for corresponding user
+	 * @param userId
+	 * @param refreshtoken
 	 */
 	private void storeRefreshtoken(String userId, String refreshtoken) {
 		// TODO Auto-generated method stub
